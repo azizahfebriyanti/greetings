@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>To: Kak Satrio</title>
+<meta name="description" content="aku gamau kalah wle ><">
+<meta property="og:title" content="Have a nice day juga ya, Kakk!">
+<meta name="theme-color" content="#ffe3ef">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌷%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#ffe3ef;--card:#fff;--ink:#3b2a4a;--muted:#6f5a86;--berry:#d6336c;--violet:#7c4dff;--term:#2b2140;--termink:#d9f7e6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1228;--card:#2a1d3a;--ink:#fbeaf3;--muted:#c6b3dc;--term:#120d1f}}
+:root[data-theme="dark"]{--bg:#1d1228;--card:#2a1d3a;--ink:#fbeaf3;--muted:#c6b3dc;--term:#120d1f}
+*{box-sizing:border-box;margin:0}
+body{font-family:ui-rounded,"SF Pro Rounded",Nunito,Quicksand,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);min-height:100dvh;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));overflow-x:hidden}
+.card{width:min(100%,440px);background:var(--card);border-radius:28px;padding:28px 22px 22px;text-align:center;box-shadow:0 14px 40px rgba(124,77,255,.18)}
+h1{font-size:clamp(1.8rem,8vw,2.3rem);line-height:1.15}
+.sub{margin:10px 0 24px;color:var(--muted);line-height:1.55}
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:800;color:#fff;width:100%;min-height:50px;padding:14px 22px;border-radius:99px;background:linear-gradient(135deg,var(--berry),var(--violet));touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px}
+.msg{min-height:3.2em;margin:14px 0 2px;font-weight:600;line-height:1.45}
+.count{min-height:1.2em;font-size:.85rem;color:var(--muted)}
+.zone{position:relative;height:86px;margin-top:8px}
+.dodge{position:absolute;left:50%;top:18px;transform:translateX(-50%);width:auto;white-space:nowrap;background:transparent;color:var(--ink);border:2px dashed var(--berry)}
+.foot{margin-top:6px;font-size:.8rem;color:var(--muted)}
+.pop{position:fixed;z-index:5;pointer-events:none;font-size:22px;animation:pop .9s ease-out forwards}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.4)}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pop{display:none}}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Have a nice day juga, Kak Satrio! 🌷</h1>
+  <p class="sub" id="sub">aku gamau kalah wle ><</p>
+  <button class="btn" id="love">Open today's greeting 💌</button>
+  <p class="msg" id="msg" aria-live="polite"></p>
+  <p class="count" id="count"></p>
+  <p class="foot">made with (maybe) love and most of it is my ego</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const NAMA=""; // isi nama
+if(NAMA)$('sub').textContent='Hai '+NAMA+'! '+$('sub').textContent;
+
+// ucapan + hati meletup
+const M=["semoga harimu weekend selalu✨","hope u have a lancar-lancar aja day","'So, surely with hardship comes ease. Indeed, with hardship comes ease.' Surah Ash‑Sharh (94:5–6)","ayo kerja sampe bisa beli tuku 2x sehari ☕","LET'S GO SOON-TO-BE SENIOR ASSO!!!","ayo kerja biar cepet kaya dan bisa karaoke tiap minggu 🎤"];
+let n=0,last=-1;
+function burst(x,y){
+  for(let k=0;k<12;k++){
+    const e=document.createElement('span'),a=Math.random()*6.28,d=60+Math.random()*80;
+    e.className='pop';e.textContent=['💖','✨','🌷','💫','🌸'][k%5];
+    e.style.left=x+'px';e.style.top=y+'px';
+    e.style.setProperty('--dx',Math.cos(a)*d+'px');e.style.setProperty('--dy',Math.sin(a)*d-30+'px');
+    document.body.appendChild(e);e.addEventListener('animationend',()=>e.remove());
+  }
+}
+$('love').addEventListener('click',e=>{
+  let j;do{j=Math.floor(Math.random()*M.length)}while(j===last);last=j;
+  $('msg').textContent=M[j];
+  const r=e.currentTarget.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);
+});
+</script>
+</body>
+</html>
