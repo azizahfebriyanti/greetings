@@ -125,7 +125,9 @@ $('#tools').onclick=e=>{
 // ---- photos: shrink to 1600px JPEG, upload, insert at the caret
 async function shrink(f){
   const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement('canvas');
-  c.width=b.width*k;c.height=b.height*k;c.getContext('2d').drawImage(b,0,0,c.width,c.height);
+  c.width=b.width*k;
+  c.height=b.height*k;
+  c.getContext('2d').drawImage(b,0,0,c.width,c.height);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.85));
 }
 $('#pic').onclick=()=>$('#file').click();

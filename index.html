@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0b0a14">
 <title>an owl post for you 🦉</title>
+<script>document.documentElement.classList.add('mail-intro-enabled')</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦉%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri&family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
@@ -65,23 +66,242 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .owl{position:fixed;z-index:9;left:-80px;top:30%;font-size:2.4rem;pointer-events:none;animation:fly 2.2s ease-in-out forwards}
 @keyframes fly{to{left:105%;top:8%;transform:rotate(-12deg)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Personal letter intro */
+#mailExperience{display:none;position:fixed;z-index:20;inset:0;place-items:center;overflow-x:hidden;overflow-y:auto;padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));color:#30251b;background:radial-gradient(ellipse at 50% 42%,#1d1c2c28,transparent 65%),linear-gradient(180deg,#090a13a8,#08070dc9);opacity:0;transition:opacity .65s ease,transform .65s ease;}
+html.mail-intro-enabled #mailExperience{display:grid;opacity:1}
+html.mail-intro-enabled #siteMain{visibility:hidden;opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .65s ease,transform .65s ease,visibility .65s}
+html.mail-intro-enabled.mail-leaving #mailExperience{opacity:0;pointer-events:none;transform:scale(1.015)}
+html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;pointer-events:auto;transform:none}
+.mail-stage{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"visual" "hint";justify-items:center;align-content:center;gap:18px;width:min(720px,100%);min-height:min(100%,700px);margin:auto}
+.mail-object,.letter-paper{grid-area:visual;align-self:center;justify-self:center}
+.mail-object{position:relative;display:block;width:min(560px,100%);aspect-ratio:1.62;padding:0;overflow:visible;border:0;border-radius:4px;background:none;cursor:pointer;perspective:1400px;-webkit-tap-highlight-color:transparent;opacity:1;visibility:visible;transform:translateY(0) scale(1);transition:opacity .55s ease,transform .65s cubic-bezier(.2,.75,.25,1),visibility .55s;}
+.mail-object:focus-visible,.mail-continue:focus-visible{outline:3px solid #eccb8b;outline-offset:6px}
+.mail-object__inner{position:absolute;inset:0;display:block;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.72,.18,1)}
+.mail-face{position:absolute;inset:0;display:block;overflow:hidden;border:1px solid #bda779;border-radius:4px;background-color:#eddfc3;background-image:radial-gradient(ellipse at 18% 17%,#fff9e3a3,transparent 38%),radial-gradient(ellipse at 88% 82%,#aa895336,transparent 38%),linear-gradient(137deg,#f6e9cd,#e5d2ad 54%,#f1e2c5);box-shadow:0 22px 60px #000a,inset 0 0 46px #a47a3d29;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.mail-face::after{position:absolute;inset:8px;border:1px solid #8b6e4230;content:"";pointer-events:none}
+.mail-face--address{display:grid;place-items:center;color:#245b43;transform:rotateY(0deg)}
+.mail-face--address::before{position:absolute;inset:0;content:"";opacity:.22;background:repeating-linear-gradient(8deg,transparent 0 23px,#9c7a4333 24px,#fff8e766 25px,transparent 27px)}
+.mail-recipient{position:relative;z-index:1;max-width:80%;color:#285940;font:500 clamp(1.25rem,4.7vw,2.2rem)/1.3 var(--body);letter-spacing:.035em;text-align:center;text-shadow:0 1px #fff9,0 0 1px #244a35;}
+.mail-recipient strong{display:block;font:inherit;text-transform:uppercase}
+.mail-recipient small{display:block;margin-top:8px;font:400 clamp(.87rem,2.8vw,1.08rem)/1.45 var(--body);letter-spacing:.015em;text-transform:capitalize;white-space:pre-line}
+.mail-face--front{transform:rotateY(180deg)}
+.mail-fold{position:absolute;inset:0;pointer-events:none}
+.mail-fold--left{z-index:1;background:linear-gradient(125deg,#ead8b6,#f6e9cf);clip-path:polygon(0 0,51% 52%,0 100%)}
+.mail-fold--right{z-index:1;background:linear-gradient(235deg,#d9c39d,#f5e6c9);clip-path:polygon(100% 0,49% 52%,100% 100%)}
+.mail-fold--bottom{z-index:2;background:linear-gradient(0deg,#ddc8a2,#f5e7cc 75%);clip-path:polygon(0 100%,50% 46%,100% 100%)}
+.mail-fold--top{z-index:3;background:linear-gradient(180deg,#f7ead0,#e3cfaa);clip-path:polygon(0 0,100% 0,50% 58%);filter:drop-shadow(0 3px 2px #71552b32)}
+.mail-crest{position:absolute;z-index:4;top:5%;left:50%;display:block;width:clamp(92px,17vw,132px);height:clamp(116px,22vw,168px);transform:translateX(-50%);filter:drop-shadow(0 2px 2px #4e372c33)}
+.mail-crest img,.letter-crest img{display:block;width:100%;height:100%;object-fit:contain}
+.mail-wax{position:absolute;z-index:6;top:55%;left:50%;display:grid;place-items:center;width:clamp(68px,15vw,94px);aspect-ratio:1;border:2px solid #81202b;border-radius:48% 52% 46% 54%/52% 47% 53% 48%;color:#edb1a3;background:radial-gradient(circle at 32% 26%,#bf3a43,#78141f 61%,#4a0710);box-shadow:0 5px 12px #35251c73,inset 0 0 0 4px #9f2934,inset 0 0 0 6px #d7655944,0 0 0 1px #42050b;transform:translateX(-50%) rotate(-7deg);font:700 clamp(1.5rem,5vw,2.1rem) var(--body);text-shadow:0 1px 3px #3c0710}
+.mail-wax::before{position:absolute;inset:9px;border:1px solid #e9897b66;border-radius:inherit;content:""}
+.mail-postmark{position:absolute;z-index:4;top:54%;right:9%;display:grid;gap:5px;width:27%;transform:rotate(-7deg)}
+.mail-postmark i{display:block;height:2px;border-radius:4px;background:#8b394080}
+.mail-postmark i:nth-child(2){width:87%}.mail-postmark i:nth-child(3){width:95%}
+.mail-hint{grid-area:hint;min-height:1.5em;margin:0;color:#f1e6d7;font:500 .82rem var(--cap);letter-spacing:.09em;text-align:center;text-shadow:0 2px 10px #000;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease,visibility .35s;}
+#mailExperience[data-phase="swarm"] .mail-object,#mailExperience[data-phase="swarm"] .mail-hint{opacity:0;visibility:hidden;transform:translateY(16px) scale(.97)}
+#mailExperience[data-phase="back"] .mail-object,#mailExperience[data-phase="back"] .mail-hint,#mailExperience[data-phase="front"] .mail-object,#mailExperience[data-phase="front"] .mail-hint{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+#mailExperience[data-phase="front"] .mail-object__inner{transform:rotateY(180deg)}
+#mailExperience[data-phase="letter"] .mail-object{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(12px) scale(.91)}
+#mailExperience[data-phase="letter"] .mail-hint{display:none}
+.mail-storm{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:1;transition:opacity .5s ease,visibility .5s}
+#mailExperience[data-phase="back"] .mail-storm,#mailExperience[data-phase="front"] .mail-storm,#mailExperience[data-phase="letter"] .mail-storm{opacity:0;visibility:hidden}
+.flying-envelope{position:absolute;top:-20vh;left:var(--left);width:var(--width);aspect-ratio:1.58;border:1px solid #a88c5e;border-radius:2px;background:linear-gradient(150deg,#f8edda,#dfcaa5);box-shadow:0 12px 32px #0009;opacity:0;transform-style:preserve-3d;animation:letter-swoop var(--duration) var(--delay) cubic-bezier(.32,.05,.56,.98) forwards;will-change:transform,opacity}
+.flying-envelope::before{position:absolute;inset:0;background:linear-gradient(150deg,#fff2d9,#e6d3ad);clip-path:polygon(0 0,100% 0,50% 62%);content:""}
+.flying-envelope::after{position:absolute;z-index:1;top:39%;left:47%;width:13%;aspect-ratio:1;border:1px solid #7a1723;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c04145,#72101b 72%);box-shadow:0 2px 4px #47331e66;content:""}
+.flying-address{position:absolute;z-index:1;right:4%;bottom:10%;left:5%;overflow:hidden;color:#285940;font:500 clamp(6px,1vw,10px)/1.1 var(--body);letter-spacing:.01em;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.flying-stamp{position:absolute;z-index:1;top:5%;right:5%;display:grid;place-items:center;width:17%;aspect-ratio:1;border:1px dashed #8a3440;color:#812c39;background:#e7d2ad;font:700 clamp(7px,.9vw,10px) var(--cap)}
+@keyframes letter-swoop{0%{opacity:0;transform:translate3d(0,-8vh,0) rotateX(var(--from-flip)) rotateZ(var(--from-rotate)) scale(.48)}9%{opacity:1}30%{transform:translate3d(var(--sway-one),25vh,0) rotateX(var(--mid-flip)) rotateZ(var(--mid-rotate)) scale(var(--mid-scale))}58%{transform:translate3d(var(--sway-two),70vh,0) rotateX(var(--to-flip)) rotateZ(var(--to-rotate)) scale(var(--to-scale))}84%{opacity:1;transform:translate3d(var(--sway-three),112vh,0) rotateX(var(--mid-flip)) rotateZ(var(--from-rotate)) scale(.82)}96%{opacity:.95}100%{opacity:0;transform:translate3d(var(--sway-four),145vh,0) rotateX(var(--from-flip)) rotateZ(var(--to-rotate)) scale(.7)}}
+.letter-paper{position:relative;width:min(620px,100%);max-height:calc(100svh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));overflow:auto;padding:clamp(27px,6vw,48px) clamp(24px,7vw,58px) 30px;border:1px solid #9d8459;color:#322619;background:radial-gradient(ellipse at 14% 6%,#fff9e5aa,transparent 32%),radial-gradient(ellipse at 92% 88%,#a17b4233,transparent 36%),linear-gradient(137deg,#f6e9cf,#e9d8b7 53%,#f3e5c8);box-shadow:0 28px 76px #000c,inset 0 0 50px #a57d3e2b;opacity:0;visibility:hidden;transform:translateY(28px) scale(.96);transition:opacity .65s ease,transform .75s cubic-bezier(.2,.75,.25,1),visibility .65s;}
+.letter-paper::before{position:absolute;inset:9px;border:1px solid #8c6a382f;content:"";pointer-events:none}
+#mailExperience[data-phase="letter"] .letter-paper{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.letter-heading{display:grid;justify-items:center;margin:0 auto 25px;color:#355d43;text-align:center}
+.letter-crest{display:block;width:118px;height:105px;margin:0 auto 10px;filter:drop-shadow(0 1px 1px #4e372c22)}
+.letter-rule{width:min(220px,65%);height:1px;margin:14px auto 0;background:linear-gradient(90deg,transparent,#6b815e,transparent)}
+.letter-address{margin:0 0 23px;color:#315c42;font:500 clamp(.98rem,3vw,1.16rem)/1.5 var(--body)}
+.letter-address span{display:block;margin-bottom:5px;font:500 .62rem var(--cap);letter-spacing:.16em;color:#806844}
+.letter-address strong,.letter-address small{display:block}
+.letter-address small{margin-top:2px;font-size:.96em;white-space:pre-line}
+.letter-salutation,.letter-closing,.letter-signature{margin:0 0 15px;color:#315c42;font:italic 1.1rem/1.55 var(--body)}
+.letter-copy{color:#315c42;font:400 clamp(1.06rem,3vw,1.24rem)/1.8 var(--body);text-wrap:pretty}
+.letter-copy p{margin:0 0 1em}
+.letter-closing{margin-top:21px;margin-bottom:8px}
+.letter-signature{margin:0 0 24px;font-size:1.2rem}
+.letter-footer{margin-top:18px;padding-top:10px;border-top:1px solid #80684444;color:#806844;font:500 .52rem var(--cap);letter-spacing:.11em;text-align:center}
+.mail-continue{position:relative;z-index:1;display:block;width:100%;min-height:48px;margin:23px auto 0;padding:12px 18px;border:1px solid #78613c;border-radius:2px;color:#f6ead2;background:linear-gradient(115deg,#284f3a,#356347);box-shadow:0 7px 18px #45362438;font:600 .76rem var(--cap);letter-spacing:.08em;cursor:pointer;transition:transform .2s ease,box-shadow .25s ease,background .25s ease}
+.mail-continue:hover{transform:translateY(-2px);background:linear-gradient(115deg,#315c43,#437655);box-shadow:0 10px 24px #4536244a}
+.mail-continue:active{transform:translateY(0) scale(.99)}
+@media(max-width:520px){#mailExperience{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}.mail-stage{gap:13px}.mail-object{width:100%;aspect-ratio:1.47}.mail-recipient{max-width:82%;font-size:clamp(1.2rem,6vw,1.7rem)}.letter-paper{max-height:calc(100svh - 24px);padding:27px 24px 24px}.letter-address{margin-bottom:18px}.letter-copy{line-height:1.68}}
+@media(max-height:520px) and (orientation:landscape){#mailExperience{place-items:start center}.mail-stage{margin:auto}.mail-object{width:min(490px,70vw);aspect-ratio:1.62}.letter-paper{max-height:calc(100svh - 20px)}}
+@media(prefers-reduced-motion:reduce){#mailExperience,.mail-object,.mail-object__inner,.mail-face,.letter-paper,.mail-hint,.mail-continue,.mail-storm{animation:none!important;transition:none!important}.flying-envelope{display:none!important}}
 </style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"></div><div id="candles" aria-hidden="true"></div>
-<main>
+<section id="mailExperience" data-phase="swarm" role="dialog" aria-modal="true" aria-label="A personal letter">
+  <div class="mail-storm" id="mailStorm" aria-hidden="true"></div>
+  <div class="mail-stage">
+    <button class="mail-object" id="mailObject" type="button" aria-label="Turn the envelope over to see the seal">
+      <span class="mail-object__inner">
+        <span class="mail-face mail-face--address">
+          <span class="mail-recipient"><strong id="postRecipient">MR. S. D. SETYAWAN</strong><small id="postAddress"></small></span>
+        </span>
+        <span class="mail-face mail-face--front" aria-hidden="true">
+          <span class="mail-fold mail-fold--left"></span>
+          <span class="mail-fold mail-fold--right"></span>
+          <span class="mail-fold mail-fold--bottom"></span>
+          <span class="mail-fold mail-fold--top"></span>
+          <span class="mail-crest"><img src="assets/hogwarts-crest.png" alt=""></span>
+          <span class="mail-postmark"><i></i><i></i><i></i></span>
+          <span class="mail-wax">H</span>
+        </span>
+      </span>
+    </button>
+    <article class="letter-paper" id="welcomeLetter" hidden aria-labelledby="letterSalutation">
+      <header class="letter-heading" aria-hidden="true">
+        <span class="letter-crest"><img src="assets/hogwarts-crest.png" alt=""></span>
+        <span class="letter-rule"></span>
+      </header>
+      <p class="letter-address"><span>To:</span><strong id="letterRecipient">MR. S. D. SETYAWAN</strong><small id="letterAddress"></small></p>
+      <p class="letter-salutation" id="letterSalutation">Dear Satrio,</p>
+      <div class="letter-copy" id="letterCopy"></div>
+      <p class="letter-closing" id="letterClosing">Yours sincerely,</p>
+      <p class="letter-signature" id="letterSignature" hidden></p>
+      <footer class="letter-footer">HOGWARTS SCHOOL OF WITCHCRAFT AND WIZARDRY</footer>
+      <button class="mail-continue" id="enterGreeting" type="button">CONTINUE TO THE GREETING&nbsp; →</button>
+    </article>
+    <p class="mail-hint" id="mailHint" role="status" aria-live="polite"></p>
+  </div>
+</section>
+<main id="siteMain">
   <header id="home">
     <div class="orn" aria-hidden="true">✦ ⚡ ✦</div>
-    <h1 id="hi"></h1>
+    <h1 id="hi" tabindex="-1"></h1>
     <p class="sub" id="sub"></p>
     <button class="seal" id="seal" type="button" aria-label="open today's letter">♥</button>
     <p class="cap">break the seal to open today's letter</p>
   </header>
   <nav id="nav"></nav>
   <section id="view" aria-live="polite"></section>
-  <p class="foot">made with love ⸜(｡˃ ᵕ ˂ )⸝♡</p>
 </main>
 <script src="config.js"></script>
+<script>
+(() => {
+  const root = document.documentElement;
+  const flow = document.getElementById('mailExperience');
+  const envelope = document.getElementById('mailObject');
+  const letter = document.getElementById('welcomeLetter');
+  const hint = document.getElementById('mailHint');
+  const continueButton = document.getElementById('enterGreeting');
+  const prefersLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const defaults = {
+    recipient: 'MR. S. D. SETYAWAN',
+    addressLines: ['The Cupboard Under the Stairs', '4 Privet Drive', 'Little Whinging', 'Surrey'],
+    salutation: 'Dear Satrio,',
+    paragraphs: ['We are pleased to inform you that you have been given a chance to explore this web page.'],
+    closing: 'Yours sincerely,',
+    signature: ''
+  };
+  const copy = { ...defaults, ...(window.CFG && window.CFG.letter ? window.CFG.letter : {}) };
+  const recipient = String(copy.recipient || defaults.recipient);
+  const addressLines = Array.isArray(copy.addressLines) ? copy.addressLines : [String(copy.addressLines || '')];
+  const paragraphs = Array.isArray(copy.paragraphs) ? copy.paragraphs : [String(copy.paragraphs || '')];
+
+  document.getElementById('postRecipient').textContent = recipient;
+  document.getElementById('letterRecipient').textContent = recipient;
+  document.getElementById('postAddress').textContent = addressLines.join('\n');
+  document.getElementById('letterAddress').textContent = addressLines.join('\n');
+  document.getElementById('letterSalutation').textContent = String(copy.salutation || '');
+  document.getElementById('letterClosing').textContent = String(copy.closing || '');
+  const signature = document.getElementById('letterSignature');
+  if (copy.signature) {
+    signature.textContent = String(copy.signature);
+    signature.hidden = false;
+  }
+  const letterCopy = document.getElementById('letterCopy');
+  paragraphs.filter(text => String(text).trim()).forEach(text => {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = String(text);
+    letterCopy.append(paragraph);
+  });
+
+  const storm = document.getElementById('mailStorm');
+  const randomBetween = (min, max) => min + Math.random() * (max - min);
+  if (!prefersLessMotion.matches) {
+      const letterCount = window.innerWidth < 600 ? 48 : 74;
+      for (let i = 0; i < letterCount; i++) {
+      const flyingLetter = document.createElement('span');
+      const flyingAddress = document.createElement('span');
+      const flyingStamp = document.createElement('span');
+      flyingLetter.className = 'flying-envelope';
+      flyingAddress.className = 'flying-address';
+      flyingAddress.textContent = recipient;
+      flyingStamp.className = 'flying-stamp';
+      flyingStamp.textContent = 'H';
+      flyingLetter.append(flyingAddress, flyingStamp);
+      const letterWidth = Math.min(randomBetween(92, 174), window.innerWidth * .52);
+      const maxLeft = Math.max(0, 100 - letterWidth / window.innerWidth * 100);
+      flyingLetter.style.setProperty('--left', randomBetween(0, maxLeft).toFixed(1) + '%');
+      flyingLetter.style.setProperty('--width', letterWidth.toFixed(0) + 'px');
+      flyingLetter.style.setProperty('--sway-one', randomBetween(-9, 9).toFixed(0) + 'vw');
+      flyingLetter.style.setProperty('--sway-two', randomBetween(-16, 16).toFixed(0) + 'vw');
+      flyingLetter.style.setProperty('--sway-three', randomBetween(-12, 12).toFixed(0) + 'vw');
+      flyingLetter.style.setProperty('--sway-four', randomBetween(-18, 18).toFixed(0) + 'vw');
+      flyingLetter.style.setProperty('--from-rotate', randomBetween(-35, 35).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--mid-rotate', randomBetween(-190, 190).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--to-rotate', randomBetween(-360, 360).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--from-flip', randomBetween(-28, 28).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--mid-flip', randomBetween(80, 300).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--to-flip', randomBetween(250, 540).toFixed(0) + 'deg');
+      flyingLetter.style.setProperty('--mid-scale', randomBetween(.9, 1.45).toFixed(2));
+      flyingLetter.style.setProperty('--to-scale', randomBetween(.48, .95).toFixed(2));
+      flyingLetter.style.setProperty('--duration', randomBetween(1600, 2500).toFixed(0) + 'ms');
+      flyingLetter.style.setProperty('--delay', randomBetween(0, 450).toFixed(0) + 'ms');
+      storm.append(flyingLetter);
+    }
+  }
+
+  function setPhase(phase) {
+    flow.dataset.phase = phase;
+    if (phase === 'back') {
+      window.setTimeout(() => storm.replaceChildren(), 650);
+      envelope.setAttribute('aria-label', 'Turn the envelope over to see the seal');
+      hint.textContent = 'Click the letter to turn it over.';
+    } else if (phase === 'front') {
+      envelope.setAttribute('aria-label', 'Open the sealed letter');
+      hint.textContent = 'Click again to open your letter.';
+    } else if (phase === 'letter') {
+      hint.textContent = '';
+    }
+  }
+
+  envelope.addEventListener('click', () => {
+    if (flow.dataset.phase === 'back') {
+      setPhase('front');
+      return;
+    }
+    if (flow.dataset.phase === 'front') {
+      letter.hidden = false;
+      setPhase('letter');
+      window.requestAnimationFrame(() => continueButton.focus({ preventScroll: true }));
+    }
+  });
+
+  continueButton.addEventListener('click', () => {
+    root.classList.add('mail-leaving');
+    window.setTimeout(() => {
+      root.classList.remove('mail-intro-enabled', 'mail-leaving');
+      document.getElementById('hi').focus({ preventScroll: true });
+    }, prefersLessMotion.matches ? 0 : 680);
+  });
+
+  if (prefersLessMotion.matches) {
+    setPhase('back');
+  } else {
+    window.setTimeout(() => setPhase('back'), 3050);
+  }
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script>
