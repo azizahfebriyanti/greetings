@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>staff room ✒️</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap">
+<style>
+:root{color-scheme:dark;--gold:#d3a625;--red:#740001;--parch:#f1e3c3;--ink:#3a2a1a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;padding:20px 16px 60px;font:1.05rem "IM Fell English",Georgia,serif;color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 60%),radial-gradient(ellipse at 50% 120%,#4a0b16,transparent 55%),#0b0a14}
+main{display:grid;gap:10px;max-width:680px;margin:0 auto}
+h1{margin:10px 0;font:700 1.5rem Cinzel,serif;color:var(--gold);text-align:center}
+input,select,button{width:100%;padding:11px 12px;font:inherit;color:var(--parch);background:#14112a;border:1px solid #d3a62588;border-radius:5px}
+button{width:auto;cursor:pointer;font:700 .95rem Cinzel,serif}
+#save{background:var(--red)}
+.tabs,.tools,.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tabs button,.tools button{padding:9px 12px}
+.tabs .on{background:var(--red);border-color:var(--gold)}
+#extra{display:grid;gap:10px}
+#ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
+#ed:focus{outline-color:var(--gold)}
+#ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
+#ed p,#ed div,#ed h3,#ed blockquote{margin:.5em 0;unicode-bidi:plaintext}
+ul{margin:0;padding:0;list-style:none}
+li{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #d3a62533}
+li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+li button{padding:4px 9px;background:none}
+</style>
+</head>
+<body>
+<main id="login">
+  <h1>✒️ Staff Room</h1>
+  <input id="em" type="email" placeholder="email" autocomplete="username">
+  <input id="pw" type="password" placeholder="password" autocomplete="current-password">
+  <button id="go" type="button">Alohomora</button>
+  <p id="err"></p>
+</main>
+<main id="app" hidden>
+  <h1>✒️ Staff Room</h1>
+  <div class="tabs" id="tabs"></div>
+  <input type="date" id="day" aria-label="date shown on the page">
+  <input id="title">
+  <div id="extra"></div>
+  <div class="tools" id="tools">
+    <button type="button" data-c="bold"><b>B</b></button>
+    <button type="button" data-c="italic"><i>I</i></button>
+    <button type="button" data-c="h">Heading</button>
+    <button type="button" data-c="q">Quote</button>
+    <button type="button" id="pic">📷 Photo</button>
+    <input type="file" id="file" accept="image/*" hidden>
+  </div>
+  <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
+  <div class="row">
+    <button type="button" id="save">Save ✨</button>
+    <button type="button" id="new">New</button>
+    <span id="st" role="status"></span>
+    <button type="button" id="out" style="margin-left:auto">Log out</button>
+  </div>
+  <h1 style="font-size:1.1rem">Recent entries</h1>
+  <ul id="recent"></ul>
+</main>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const $=s=>document.querySelector(s),C=window.CFG||{},T=new Date().toLocaleDateString('en-CA');
+if(!C.url||!window.supabase){document.body.innerHTML='<p style="padding:30px">Fill in config.js first (see setup.sql).</p>';throw new Error('no config')}
+const sb=supabase.createClient(C.url,C.key);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const txt=h=>new DOMParser().parseFromString(h||'','text/html').body.textContent;
+const st=t=>{$('#st').textContent=t||''};
+
+// kind: [icon, label, title placeholder (null = no title), extra fields]
+const K={
+  letter:['✉️','Letter','Title (optional), e.g. Dear you,',[]],
+  song:['🎶','Song','Song title',[['artist','Artist'],['link','Spotify / YouTube link']]],
+  hadith:['📜','Hadith','Label (optional)',[['source','Source, e.g. Sahih Bukhari 1']]],
+  reason:['🪞','Reason',null,[]],
+  place:['🗺️','Place','Place name',[['rating']]]
+};
+let cur='letter',edit=null,rows=[],rng;
+document.execCommand('defaultParagraphSeparator',false,'p');
+
+$('#tabs').innerHTML=Object.entries(K).map(([k,v])=>`<button type="button" data-k="${k}">${v[0]} ${v[1]}</button>`).join('');
+$('#tabs').onclick=e=>{const k=e.target.closest('button')?.dataset.k;if(k)form(k)};
+
+function form(k,row){
+  cur=k;edit=row?row.id:null;
+  const v=K[k],m=row?.meta||{};
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  $('#title').hidden=!v[2];$('#title').placeholder=v[2]||'';$('#title').value=row?.title||'';
+  $('#day').value=row?.day||T;
+  $('#extra').innerHTML=v[3].map(([n,p])=>n==='rating'
+    ?`<select id="x_${n}" aria-label="rating">${[5,4,3,2,1].map(r=>`<option value="${r}">${'★'.repeat(r)}${'☆'.repeat(5-r)}</option>`).join('')}</select>`
+    :`<input id="x_${n}" placeholder="${p}">`).join('');
+  v[3].forEach(([n])=>{if(m[n]!=null)$('#x_'+n).value=m[n]});
+  $('#ed').innerHTML=row?.body||'';
+  st(row?'Editing. Save updates this entry.':'');
+}
+
+// ---- editor: remember the caret so a photo can land anywhere in the text
+const ed=$('#ed');
+const keep=()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))rng=s.getRangeAt(0).cloneRange()};
+document.addEventListener('selectionchange',keep);
+function restore(){
+  ed.focus();const s=getSelection();s.removeAllRanges();
+  if(rng)s.addRange(rng);else{const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);s.addRange(r)}
+}
+function put(n){
+  restore();const s=getSelection(),r=s.getRangeAt(0);
+  r.deleteContents();r.insertNode(n);r.setStartAfter(n);r.collapse(true);
+  s.removeAllRanges();s.addRange(r);keep();
+}
+ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
+$('#tools').onclick=e=>{
+  const c=e.target.closest('button')?.dataset.c;if(!c)return;
+  restore();
+  if(c==='h')document.execCommand('formatBlock',false,'h3');
+  else if(c==='q')document.execCommand('formatBlock',false,'blockquote');
+  else document.execCommand(c);
+};
+
+// ---- photos: shrink to 1600px JPEG, upload, insert at the caret
+async function shrink(f){
+  const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement('canvas');
+  c.width=b.width*k;c.height=b.height*k;c.getContext('2d').drawImage(b,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+}
+$('#pic').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  st('Uploading photo…');
+  try{
+    const name=crypto.randomUUID()+'.jpg';
+    const{error}=await sb.storage.from('photos').upload(name,await shrink(f),{contentType:'image/jpeg'});
+    if(error)throw error;
+    const img=new Image();img.alt='';img.src=sb.storage.from('photos').getPublicUrl(name).data.publicUrl;
+    put(img);st('Photo added.');
+  }catch(x){st(x.message||'Photo upload failed.')}
+};
+
+// ---- save / list / edit / delete
+$('#save').onclick=async()=>{
+  const meta={};
+  K[cur][3].forEach(([n])=>{const v=$('#x_'+n).value.trim();meta[n]=n==='rating'?+v:v});
+  const row={kind:cur,day:$('#day').value||T,title:$('#title').value.trim(),body:ed.innerHTML,meta};
+  st('Saving…');
+  const{error}=edit?await sb.from('entries').update(row).eq('id',edit):await sb.from('entries').insert(row);
+  if(error)return st(error.message);
+  form(cur);recent();st('Saved ✨');
+};
+$('#new').onclick=()=>form(cur);
+
+async function recent(){
+  const{data}=await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(20);
+  rows=data||[];
+  $('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('');
+}
+$('#recent').onclick=async e=>{
+  const i=e.target.dataset.i,d=e.target.dataset.d;
+  if(i!=null){form(rows[i].kind,rows[i]);scrollTo(0,0)}
+  if(d!=null&&confirm('Delete this entry for good?')){await sb.from('entries').delete().eq('id',rows[d].id);recent()}
+};
+
+// ---- login
+async function boot(){
+  const{data:{session}}=await sb.auth.getSession();
+  $('#login').hidden=!!session;$('#app').hidden=!session;
+  if(session){form(cur);recent()}
+}
+$('#go').onclick=async()=>{
+  const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
+  $('#err').textContent=error?error.message:'';
+  if(!error)boot();
+};
+$('#pw').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};
+$('#out').onclick=async()=>{await sb.auth.signOut();boot()};
+boot();
+</script>
+</body>
+</html>
