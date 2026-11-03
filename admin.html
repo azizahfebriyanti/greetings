@@ -20,6 +20,7 @@ button{width:auto;cursor:pointer;font:700 .95rem Cinzel,serif}
 .tabs button,.tools button{padding:9px 12px}
 .tabs .on{background:var(--red);border-color:var(--gold)}
 #extra{display:grid;gap:10px}
+.editor-note{margin:0;font-size:.85rem;opacity:.72}
 #ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
 #ed:focus{outline-color:var(--gold)}
 #ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
@@ -52,6 +53,7 @@ li button{padding:4px 9px;background:none}
     <button type="button" id="pic">📷 Photo</button>
     <input type="file" id="file" accept="image/*" hidden>
   </div>
+  <p class="editor-note">Tip: use Photo, or paste a copied image into the editor with Ctrl+V.</p>
   <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
   <div class="row">
     <button type="button" id="save">Save ✨</button>
@@ -113,7 +115,19 @@ function put(n){
   r.deleteContents();r.insertNode(n);r.setStartAfter(n);r.collapse(true);
   s.removeAllRanges();s.addRange(r);keep();
 }
-ed.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
+ed.addEventListener('paste',async e=>{
+  const clipboard=e.clipboardData;
+  const items=Array.from(clipboard?.items||[]);
+  let images=items.filter(item=>item.kind==='file'&&item.type.startsWith('image/')).map(item=>item.getAsFile()).filter(Boolean);
+  if(!images.length)images=Array.from(clipboard?.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(images.length){
+    e.preventDefault();
+    for(const image of images)await addPhoto(image);
+    return;
+  }
+  e.preventDefault();
+  document.execCommand('insertText',false,clipboard?.getData('text/plain')||'');
+});
 $('#tools').onclick=e=>{
   const c=e.target.closest('button')?.dataset.c;if(!c)return;
   restore();
@@ -131,20 +145,30 @@ async function shrink(f){
   return new Promise(r=>c.toBlob(r,'image/jpeg',.85));
 }
 $('#pic').onclick=()=>$('#file').click();
-$('#file').onchange=async e=>{
-  const f=e.target.files[0];e.target.value='';if(!f)return;
+async function addPhoto(file){
+  const img=new Image(),local=URL.createObjectURL(file);
+  img.alt='';img.src=local;img.style.opacity='.45';put(img);
   st('Uploading photo…');
   try{
+    const blob=await shrink(file);
+    if(!blob)throw new Error('Could not prepare the image.');
     const name=crypto.randomUUID()+'.jpg';
-    const{error}=await sb.storage.from('photos').upload(name,await shrink(f),{contentType:'image/jpeg'});
+    const{error}=await sb.storage.from('photos').upload(name,blob,{contentType:'image/jpeg'});
     if(error)throw error;
-    const img=new Image();img.alt='';img.src=sb.storage.from('photos').getPublicUrl(name).data.publicUrl;
-    put(img);st('Photo added.');
-  }catch(x){st(x.message||'Photo upload failed.')}
+    img.src=sb.storage.from('photos').getPublicUrl(name).data.publicUrl;
+    img.removeAttribute('style');URL.revokeObjectURL(local);st('Photo added.');
+  }catch(x){img.remove();URL.revokeObjectURL(local);st(x.message||'Photo upload failed.')}
+}
+$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addPhoto(f)};
+}
+$('#file').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  await addPhoto(f);
 };
 
 // ---- save / list / edit / delete
 $('#save').onclick=async()=>{
+  if(ed.querySelector('img[src^="blob:"]'))return st('A photo is still uploading. Try again in a moment.');
   const meta={};
   K[cur][3].forEach(([n])=>{const v=$('#x_'+n).value.trim();meta[n]=n==='rating'?+v:v});
   const row={kind:cur,day:$('#day').value||T,title:$('#title').value.trim(),body:ed.innerHTML,meta};
