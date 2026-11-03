@@ -19,8 +19,10 @@ create table if not exists entries (
 
 alter table entries enable row level security;
 
+drop policy if exists "anyone can read" on entries;
 create policy "anyone can read" on entries for select using (true);
 
+drop policy if exists "only the owner writes" on entries;
 create policy "only the owner writes" on entries for all to authenticated
   using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com')
   with check ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
@@ -30,9 +32,39 @@ create policy "only the owner writes" on entries for all to authenticated
 grant select on public.entries to anon, authenticated;
 grant insert, update, delete on public.entries to authenticated;
 
+-- A reader can leave one emoji reaction per browser for each letter.
+create table if not exists letter_reactions (
+  id uuid primary key default gen_random_uuid(),
+  entry_id uuid not null references entries(id) on delete cascade,
+  visitor_id text not null,
+  reaction text not null check (reaction in ('❤️','🥹','🥰','🌷','😂')),
+  created_at timestamptz not null default now(),
+  unique (entry_id, visitor_id)
+);
+
+alter table letter_reactions enable row level security;
+drop policy if exists "anyone can add letter reactions" on letter_reactions;
+create policy "anyone can add letter reactions" on letter_reactions
+  for insert to anon, authenticated with check (true);
+drop policy if exists "only the owner can read letter reactions" on letter_reactions;
+create policy "only the owner can read letter reactions" on letter_reactions
+  for select to authenticated using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
+grant select on public.letter_reactions to authenticated;
+grant insert on public.letter_reactions to anon, authenticated;
+
 insert into storage.buckets (id, name, public)
 values ('photos', 'photos', true)
 on conflict (id) do nothing;
 
+drop policy if exists "only the owner uploads photos" on storage.objects;
 create policy "only the owner uploads photos" on storage.objects for insert to authenticated
   with check (bucket_id = 'photos' and (auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
+
+-- Audio and video for letter entries use a separate public bucket with a 100 MB limit.
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('media', 'media', true, 104857600)
+on conflict (id) do update set public = excluded.public, file_size_limit = excluded.file_size_limit;
+
+drop policy if exists "only the owner uploads letter media" on storage.objects;
+create policy "only the owner uploads letter media" on storage.objects for insert to authenticated
+  with check (bucket_id = 'media' and (auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');

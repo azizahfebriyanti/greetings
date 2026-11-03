@@ -11,7 +11,25 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;padding:20px 16px 60px;font:1.05rem "IM Fell English",Georgia,serif;color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 60%),radial-gradient(ellipse at 50% 120%,#4a0b16,transparent 55%),#0b0a14}
+body.login-screen{display:grid;place-items:center;min-height:100svh;padding:max(22px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom));overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 12%,#262e70 0,transparent 45%),radial-gradient(ellipse at 50% 100%,#490b24 0,transparent 48%),#080811}
+body.login-screen::before,body.login-screen::after{position:fixed;inset:-20%;z-index:-1;pointer-events:none;content:""}
+body.login-screen::before{opacity:.72;background:radial-gradient(2px 2px at 12% 22%,#fff9,transparent 70%),radial-gradient(1px 1px at 27% 76%,#f5d58f,transparent 70%),radial-gradient(2px 2px at 52% 33%,#fff8,transparent 70%),radial-gradient(1px 1px at 75% 18%,#fff9,transparent 70%),radial-gradient(2px 2px at 88% 69%,#f5d58f99,transparent 70%),radial-gradient(1px 1px at 63% 88%,#fff9,transparent 70%);background-size:320px 260px;animation:login-stars 24s linear infinite}
+body.login-screen::after{inset:0;opacity:.62;background:radial-gradient(ellipse at 50% 48%,transparent 18%,#08081188 75%),radial-gradient(ellipse at 16% 50%,#751b3b35,transparent 36%),radial-gradient(ellipse at 84% 38%,#3c4da344,transparent 40%);animation:login-glow 9s ease-in-out infinite alternate}
+@keyframes login-stars{to{transform:translate3d(0,34px,0)}}
+@keyframes login-glow{to{opacity:.9;transform:scale(1.04)}}
 main{display:grid;gap:10px;max-width:680px;margin:0 auto}
+#login{position:relative;isolation:isolate;width:min(100%,450px);margin:auto;padding:clamp(28px,7vw,48px);gap:17px;border:1px solid #d3a62577;background:linear-gradient(145deg,#19172ceF,#0d0c18f5);box-shadow:0 28px 90px #000a,0 0 60px #6d193c25,inset 0 0 36px #d3a62509;text-align:center}
+#login::before{position:absolute;inset:9px;z-index:-1;border:1px solid #d3a62535;content:"";pointer-events:none}
+#login h1{margin:0 0 8px;font-size:clamp(1.55rem,7vw,2rem);letter-spacing:.1em;text-shadow:0 0 24px #d3a62544}
+#login input{min-height:48px;border-color:#d3a62555;background:#0d0c18cc;text-align:left}
+#login input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#go{width:100%;min-height:50px;border-color:#eeba30;background:linear-gradient(115deg,#6f0a2f,#3c174e 58%,#1a2850);box-shadow:0 7px 24px #74000155,inset 0 1px #fff2;transition:transform .2s,box-shadow .2s,filter .2s}
+#go:hover{transform:translateY(-2px);filter:brightness(1.12);box-shadow:0 10px 30px #74000188,0 0 18px #d3a6252b}
+#go:active{transform:translateY(0) scale(.99)}
+#login :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#err{min-height:1.4em;margin:0;color:#ffb4b4;font:500 .9rem system-ui,sans-serif}
+body.login-screen #login{animation:login-arrive .7s cubic-bezier(.2,.75,.25,1) both}
+@keyframes login-arrive{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 h1{margin:10px 0;font:700 1.5rem Cinzel,serif;color:var(--gold);text-align:center}
 input,select,button{width:100%;padding:11px 12px;font:inherit;color:var(--parch);background:#14112a;border:1px solid #d3a62588;border-radius:5px}
 button{width:auto;cursor:pointer;font:700 .95rem Cinzel,serif}
@@ -24,18 +42,26 @@ button{width:auto;cursor:pointer;font:700 .95rem Cinzel,serif}
 #ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
 #ed:focus{outline-color:var(--gold)}
 #ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
+#ed audio,#ed video{display:block;width:min(100%,520px);max-width:100%;margin:14px auto}
+#ed video{max-height:420px;background:#090a13}
 #ed p,#ed div,#ed h3,#ed blockquote{margin:.5em 0;unicode-bidi:plaintext}
+.draft-state{min-height:1.2em;margin:0;color:#eeba30;font-size:.84rem}
+.section-title{margin:20px 0 3px;font-size:1.05rem}
+.draft-open{display:grid;gap:2px;flex:1;width:auto;padding:6px 8px;border:0;background:none;text-align:left;font:inherit;font-size:.95rem}
+.draft-open small{color:var(--gold);font-size:.76rem;font-weight:400}
+.draft-remove{width:auto;min-width:36px;padding:4px 9px;background:none}
 ul{margin:0;padding:0;list-style:none}
 li{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #d3a62533}
 li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 li button{padding:4px 9px;background:none}
+@media(prefers-reduced-motion:reduce){body.login-screen::before,body.login-screen::after,#login{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body>
+<body class="login-screen">
 <main id="login">
   <h1>✒️ Staff Room</h1>
-  <input id="em" type="email" placeholder="email" autocomplete="username">
-  <input id="pw" type="password" placeholder="password" autocomplete="current-password">
+  <input id="em" type="email" placeholder="email" aria-label="Email" autocomplete="username">
+  <input id="pw" type="password" placeholder="password" aria-label="Password" autocomplete="current-password">
   <button id="go" type="button">Alohomora</button>
   <p id="err"></p>
 </main>
@@ -52,9 +78,14 @@ li button{padding:4px 9px;background:none}
     <button type="button" data-c="q">Quote</button>
     <button type="button" id="pic">📷 Photo</button>
     <input type="file" id="file" accept="image/*" hidden>
+    <button type="button" id="voice" hidden>🎙 Voice note</button>
+    <input type="file" id="voiceFile" accept="audio/*" hidden>
+    <button type="button" id="video" hidden>🎥 Video</button>
+    <input type="file" id="videoFile" accept="video/*" hidden>
   </div>
-  <p class="editor-note">Tip: use Photo, or paste a copied image into the editor with Ctrl+V.</p>
+  <p class="editor-note">Tip: use Photo, or paste a copied image into the editor with Ctrl+V. Letter entries can also include a voice note or video.</p>
   <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
+  <p id="draftState" class="draft-state" role="status" aria-live="polite"></p>
   <div class="row">
     <button type="button" id="save">Save ✨</button>
     <button type="button" id="new">New</button>
@@ -63,6 +94,10 @@ li button{padding:4px 9px;background:none}
   </div>
   <h1 style="font-size:1.1rem">Recent entries</h1>
   <ul id="recent"></ul>
+  <h2 class="section-title">Drafts saved on this device</h2>
+  <ul id="drafts"></ul>
+  <h2 class="section-title">Reactions from the owl post</h2>
+  <ul id="reactions"></ul>
 </main>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -82,28 +117,79 @@ const K={
   reason:['🪞','Reason',null,[]],
   place:['🗺️','Place','Place name',[['rating']]]
 };
-let cur='letter',edit=null,rows=[],rng;
+const ed=$('#ed'),DRAFT_STORE='owlpost:staff-drafts:v1',LAST_DRAFT_STORE='owlpost:staff-last-draft:v1';
+let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0;
+const newId=()=>crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+function readDrafts(){try{const value=JSON.parse(localStorage.getItem(DRAFT_STORE)||'{}');return value&&typeof value==='object'?value:{}}catch{return{}}}
+function writeDrafts(value){try{localStorage.setItem(DRAFT_STORE,JSON.stringify(value));return true}catch{$('#draftState').textContent='Could not save this draft on the device.';return false}}
+function renderDrafts(){
+  const drafts=Object.entries(readDrafts()).sort((a,b)=>(b[1].updatedAt||0)-(a[1].updatedAt||0));
+  $('#drafts').innerHTML=drafts.length?drafts.map(([key,d])=>{
+    const label=d.title||txt(d.body).trim().replace(/\s+/g,' ').slice(0,58)||'Untitled draft';
+    const stamp=d.updatedAt?new Date(d.updatedAt).toLocaleString():'';
+    return`<li><button class="draft-open" type="button" data-draft="${esc(key)}"><span>${esc(label)}</span><small>${esc(K[d.kind]?.[1]||d.kind)} · ${esc(stamp)}</small></button><button class="draft-remove" type="button" data-remove-draft="${esc(key)}" aria-label="Delete saved draft">✕</button></li>`
+  }).join(''):'<li><span>No saved drafts yet.</span></li>';
+}
+function chooseDraftKey(k,row){
+  if(row?.id)return`entry:${row.id}`;
+  const drafts=Object.entries(readDrafts()).filter(([,d])=>d.kind===k&&!d.entryId).sort((a,b)=>(b[1].updatedAt||0)-(a[1].updatedAt||0));
+  return drafts[0]?.[0]||`new:${newId()}`;
+}
+function currentMeta(){
+  const meta={};
+  K[cur][3].forEach(([n])=>{const input=$('#x_'+n);if(input){const value=input.value.trim();meta[n]=n==='rating'?+value:value}});
+  return meta;
+}
+function stashDraft(){
+  if(!formReady||$('#app').hidden)return;
+  clearTimeout(draftTimer);draftTimer=0;
+  const copy=ed.cloneNode(true);
+  copy.querySelectorAll('img[src^="blob:"],audio[src^="blob:"],video[src^="blob:"]').forEach(node=>node.remove());
+  const draft={kind:cur,entryId:edit,title:$('#title').value.trim(),day:$('#day').value||T,meta:currentMeta(),body:copy.innerHTML,updatedAt:Date.now()};
+  const hasContent=!!(draft.title||draft.body.trim()||Object.values(draft.meta).some(value=>String(value).trim()));
+  const drafts=readDrafts();
+  if(!hasContent&&!edit)delete drafts[activeDraftKey];
+  else drafts[activeDraftKey]=draft;
+  try{localStorage.setItem(LAST_DRAFT_STORE,activeDraftKey)}catch{}
+  if(writeDrafts(drafts))$('#draftState').textContent=hasContent||edit?'Draft saved on this device.':'';
+  renderDrafts();
+}
+function scheduleDraft(){
+  if(!formReady)return;
+  $('#draftState').textContent='Saving draft…';
+  clearTimeout(draftTimer);draftTimer=setTimeout(stashDraft,350);
+}
+document.addEventListener('input',e=>{if(ed.contains(e.target)||e.target.matches('#title,#day,#extra input,#extra select'))scheduleDraft()});
+document.addEventListener('change',e=>{if(e.target.matches('#title,#day,#extra input,#extra select'))scheduleDraft()});
+window.addEventListener('beforeunload',()=>{clearTimeout(draftTimer);stashDraft()});
 document.execCommand('defaultParagraphSeparator',false,'p');
 
 $('#tabs').innerHTML=Object.entries(K).map(([k,v])=>`<button type="button" data-k="${k}">${v[0]} ${v[1]}</button>`).join('');
 $('#tabs').onclick=e=>{const k=e.target.closest('button')?.dataset.k;if(k)form(k)};
 
-function form(k,row){
+function form(k,row,options={}){
+  if(formReady)stashDraft();else{clearTimeout(draftTimer);draftTimer=0}
+  formReady=false;
   cur=k;edit=row?row.id:null;
-  const v=K[k],m=row?.meta||{};
+  activeDraftKey=options.draftKey||(options.fresh?`new:${newId()}`:chooseDraftKey(k,row));
+  try{localStorage.setItem(LAST_DRAFT_STORE,activeDraftKey)}catch{}
+  const draft=readDrafts()[activeDraftKey],source=draft||row||{},v=K[k],m=source.meta||{};
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
-  $('#title').hidden=!v[2];$('#title').placeholder=v[2]||'';$('#title').value=row?.title||'';
-  $('#day').value=row?.day||T;
+  $('#title').hidden=!v[2];$('#title').placeholder=v[2]||'';$('#title').value=source.title||'';
+  $('#day').value=source.day||T;
   $('#extra').innerHTML=v[3].map(([n,p])=>n==='rating'
     ?`<select id="x_${n}" aria-label="rating">${[5,4,3,2,1].map(r=>`<option value="${r}">${'★'.repeat(r)}${'☆'.repeat(5-r)}</option>`).join('')}</select>`
     :`<input id="x_${n}" placeholder="${p}">`).join('');
   v[3].forEach(([n])=>{if(m[n]!=null)$('#x_'+n).value=m[n]});
-  $('#ed').innerHTML=row?.body||'';
-  st(row?'Editing. Save updates this entry.':'');
+  ed.innerHTML=source.body||'';
+  $('#voice').hidden=k!=='letter';$('#video').hidden=k!=='letter';
+  formReady=true;
+  $('#draftState').textContent=draft?'Restored draft from this device.':'Changes autosave on this device.';
+  st(draft?'Draft restored. Save when it is ready.':row?'Editing. Save updates this entry.':'');
+  renderDrafts();
 }
 
 // ---- editor: remember the caret so a photo can land anywhere in the text
-const ed=$('#ed');
 const keep=()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))rng=s.getRangeAt(0).cloneRange()};
 document.addEventListener('selectionchange',keep);
 function restore(){
@@ -114,6 +200,7 @@ function put(n){
   restore();const s=getSelection(),r=s.getRangeAt(0);
   r.deleteContents();r.insertNode(n);r.setStartAfter(n);r.collapse(true);
   s.removeAllRanges();s.addRange(r);keep();
+  scheduleDraft();
 }
 ed.addEventListener('paste',async e=>{
   const clipboard=e.clipboardData;
@@ -125,8 +212,16 @@ ed.addEventListener('paste',async e=>{
     for(const image of images)await addPhoto(image);
     return;
   }
+  const inlineImage=(clipboard?.getData('text/html')||'').match(/<img\b[^>]*\bsrc=["'](data:image\/[^"']+)["']/i)?.[1];
+  if(inlineImage){
+    e.preventDefault();
+    try{const blob=await(await fetch(inlineImage)).blob();await addPhoto(new File([blob],'pasted-image.'+(blob.type.split('/')[1]||'png'),{type:blob.type||'image/png'}))}
+    catch(x){st(x.message||'Could not read the pasted image.')}
+    return;
+  }
   e.preventDefault();
   document.execCommand('insertText',false,clipboard?.getData('text/plain')||'');
+  scheduleDraft();
 });
 $('#tools').onclick=e=>{
   const c=e.target.closest('button')?.dataset.c;if(!c)return;
@@ -134,6 +229,21 @@ $('#tools').onclick=e=>{
   if(c==='h')document.execCommand('formatBlock',false,'h3');
   else if(c==='q')document.execCommand('formatBlock',false,'blockquote');
   else document.execCommand(c);
+  scheduleDraft();
+};
+$('#drafts').onclick=e=>{
+  const remove=e.target.closest('[data-remove-draft]');
+  if(remove){
+    const key=remove.dataset.removeDraft;
+    if(!confirm('Delete this saved draft from this device?'))return;
+    const drafts=readDrafts();delete drafts[key];writeDrafts(drafts);renderDrafts();
+    if(key===activeDraftKey){clearTimeout(draftTimer);draftTimer=0;formReady=false;form(cur,null,{fresh:true})}
+    return;
+  }
+  const open=e.target.closest('[data-draft]');if(!open)return;
+  const key=open.dataset.draft,draft=readDrafts()[key];if(!draft)return;
+  const row=draft.entryId?{...draft,id:draft.entryId}:null;
+  form(draft.kind,row,{draftKey:key});scrollTo(0,0);
 };
 
 // ---- photos: shrink to 1600px JPEG, upload, insert at the caret
@@ -145,6 +255,8 @@ async function shrink(f){
   return new Promise(r=>c.toBlob(r,'image/jpeg',.85));
 }
 $('#pic').onclick=()=>$('#file').click();
+$('#voice').onclick=()=>$('#voiceFile').click();
+$('#video').onclick=()=>$('#videoFile').click();
 async function addPhoto(file){
   const img=new Image(),local=URL.createObjectURL(file);
   img.alt='';img.src=local;img.style.opacity='.45';put(img);
@@ -156,45 +268,78 @@ async function addPhoto(file){
     const{error}=await sb.storage.from('photos').upload(name,blob,{contentType:'image/jpeg'});
     if(error)throw error;
     img.src=sb.storage.from('photos').getPublicUrl(name).data.publicUrl;
-    img.removeAttribute('style');URL.revokeObjectURL(local);st('Photo added.');
-  }catch(x){img.remove();URL.revokeObjectURL(local);st(x.message||'Photo upload failed.')}
+    img.removeAttribute('style');URL.revokeObjectURL(local);st('Photo added.');scheduleDraft();
+  }catch(x){img.remove();URL.revokeObjectURL(local);st(x.message||'Photo upload failed.');scheduleDraft()}
 }
 $('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addPhoto(f)};
+async function addMedia(file,kind){
+  const expected=kind==='audio'?'audio/':'video/';
+  if(cur!=='letter'||!file.type.startsWith(expected))return st(`Choose a ${kind} file for a letter.`);
+  if(file.size>100*1024*1024)return st('Media files must be 100 MB or smaller.');
+  const local=URL.createObjectURL(file),media=document.createElement(kind);
+  media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
+  if(kind==='video')media.playsInline=true;
+  put(media);st(`Uploading ${kind==='audio'?'voice note':'video'}…`);
+  try{
+    const extension=(file.name.match(/\.[a-z0-9]{1,8}$/i)||[])[0]||'.'+(file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase();
+    const name=crypto.randomUUID()+extension;
+    const{error}=await sb.storage.from('media').upload(name,file,{contentType:file.type||'application/octet-stream'});
+    if(error)throw error;
+    media.src=sb.storage.from('media').getPublicUrl(name).data.publicUrl;
+    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?'Voice note added.':'Video added.');scheduleDraft();
+  }catch(x){media.remove();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
 }
-$('#file').onchange=async e=>{
-  const f=e.target.files[0];e.target.value='';if(!f)return;
-  await addPhoto(f);
-};
+$('#voiceFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'audio')};
+$('#videoFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'video')};
 
 // ---- save / list / edit / delete
 $('#save').onclick=async()=>{
-  if(ed.querySelector('img[src^="blob:"]'))return st('A photo is still uploading. Try again in a moment.');
+  if(ed.querySelector('[src^="blob:"]'))return st('Media is still uploading. Try again in a moment.');
+  clearTimeout(draftTimer);stashDraft();
   const meta={};
   K[cur][3].forEach(([n])=>{const v=$('#x_'+n).value.trim();meta[n]=n==='rating'?+v:v});
   const row={kind:cur,day:$('#day').value||T,title:$('#title').value.trim(),body:ed.innerHTML,meta};
   st('Saving…');
   const{error}=edit?await sb.from('entries').update(row).eq('id',edit):await sb.from('entries').insert(row);
   if(error)return st(error.message);
-  form(cur);recent();st('Saved ✨');
+  const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentReactions();st('Saved ✨');
 };
-$('#new').onclick=()=>form(cur);
+$('#new').onclick=()=>{stashDraft();form(cur,null,{fresh:true})};
 
 async function recent(){
   const{data}=await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(20);
   rows=data||[];
   $('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('');
 }
+async function recentReactions(){
+  const{data,error}=await sb.from('letter_reactions').select('reaction,created_at,entries(title,day)').order('created_at',{ascending:false}).limit(20);
+  if(error){$('#reactions').innerHTML='<li><span>Run the updated setup.sql to enable reactions.</span></li>';return}
+  $('#reactions').innerHTML=data?.length?data.map(item=>{
+    const entry=Array.isArray(item.entries)?item.entries[0]:item.entries||{};
+    const label=entry.title||'Letter';
+    return`<li><span>${esc(item.reaction)} ${esc(label)} · ${esc(entry.day||'')}</span><small>${esc(new Date(item.created_at).toLocaleString())}</small></li>`
+  }).join(''):'<li><span>No reactions yet.</span></li>';
+}
 $('#recent').onclick=async e=>{
   const i=e.target.dataset.i,d=e.target.dataset.d;
   if(i!=null){form(rows[i].kind,rows[i]);scrollTo(0,0)}
-  if(d!=null&&confirm('Delete this entry for good?')){await sb.from('entries').delete().eq('id',rows[d].id);recent()}
+  if(d!=null&&confirm('Delete this entry for good?')){
+    const id=rows[d].id;await sb.from('entries').delete().eq('id',id);
+    const drafts=readDrafts();delete drafts[`entry:${id}`];writeDrafts(drafts);renderDrafts();recent();recentReactions();
+  }
 };
 
 // ---- login
 async function boot(){
   const{data:{session}}=await sb.auth.getSession();
   $('#login').hidden=!!session;$('#app').hidden=!session;
-  if(session){form(cur);recent()}
+  document.body.classList.toggle('login-screen',!session);
+  if(session){
+    const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
+    const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
+    form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});
+    recent();recentReactions();
+  }
 }
 $('#go').onclick=async()=>{
   const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});

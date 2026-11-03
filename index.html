@@ -58,6 +58,17 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .body h3{font:700 1.2rem var(--cap);color:var(--red)}
 .body blockquote{padding-left:14px;border-left:3px solid var(--gold);font-style:italic}
 .body img{display:block;max-width:100%;height:auto;margin:1em auto;border:6px solid #c59a3a;outline:1px solid #6b4e16;box-shadow:0 8px 18px #0005;transform:rotate(-.8deg)}
+.body audio,.body video{display:block;width:min(100%,520px);max-width:100%;margin:1.2em auto}
+.body video{max-height:480px;background:#090a13;border:1px solid #8c6a2f55;border-radius:3px}
+.reaction{margin-top:24px;padding-top:18px;border-top:1px solid #80684444;text-align:center}
+.reaction-label{margin:0 0 12px;color:#6b4e16;font:500 .82rem var(--cap);letter-spacing:.04em}
+.reaction-trigger{min-height:42px;padding:9px 16px;border:1px solid #9b782f;border-radius:3px;color:#f7e7c6;background:linear-gradient(120deg,#284f3a,#356347);font:600 .78rem var(--cap);letter-spacing:.05em;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.reaction-trigger:hover{transform:translateY(-2px);box-shadow:0 6px 18px #35583c44}
+.reaction-options{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.reaction-option{width:46px;height:44px;padding:4px;border:1px solid #9b782f66;border-radius:50%;color:inherit;background:#fff5;cursor:pointer;font-size:1.4rem;transition:transform .18s,background .18s,border-color .18s}
+.reaction-option:hover,.reaction-option[aria-pressed="true"]{transform:scale(1.12);border-color:#9b782f;background:#d3a62533}
+.reaction-option:disabled{cursor:default;opacity:.72}
+.reaction-status{min-height:1.4em;margin:10px 0 0;color:#526b3e;font:italic .95rem var(--body)}
 .hadith .body{font-family:Amiri,var(--body);font-size:1.35rem}
 .stars{color:#b8861b;font-size:1.1rem;letter-spacing:.1em;white-space:nowrap}
 .mirror{counter-reset:r;margin:20px 0;padding:40px 18px 14px;border:10px double var(--gold);border-radius:999px 999px 14px 14px/160px 160px 14px 14px;background:radial-gradient(ellipse at 50% 0,#2e3a86,#0c1030 70%);box-shadow:0 0 40px #d3a62544,inset 0 0 40px #000}
@@ -324,7 +335,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 const $=s=>document.querySelector(s),C=window.CFG||{},T=new Date().toLocaleDateString('en-CA');
 const sb=C.url&&window.supabase?supabase.createClient(C.url,C.key):null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const clean=h=>window.DOMPurify?DOMPurify.sanitize(h||''):'';
+const clean=h=>window.DOMPurify?DOMPurify.sanitize(h||'',{ADD_TAGS:['audio','video','source'],ADD_ATTR:['controls','preload','playsinline','poster']}):'';
 const fmt=d=>new Date(d+'T00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 const calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
@@ -363,8 +374,58 @@ function card(k,e){
   if(e.title||k==='place')h=`<h2><span>${esc(e.title)}</span>${k==='place'?`<span class="stars">${stars(m.rating)}</span>`:''}</h2>`;
   if(k==='song')h+=`<p class="meta">${esc(m.artist)}${lnk(m.link)}</p>`;
   if(k==='hadith'&&m.source)h+=`<p class="meta">${esc(m.source)}</p>`;
-  return`<article class="sheet ${k}"><div class="date">${fmt(e.day)}</div>${h}${b}</article>`;
+  const react=k==='letter'?reactionMarkup(e):'';
+  return`<article class="sheet ${k}"><div class="date">${fmt(e.day)}</div>${h}${b}${react}</article>`;
 }
+
+const REACTIONS=['❤️','🥹','🥰','🌷','😂'];
+const REACTION_STORE='owlpost:letter-reactions:v1';
+const VISITOR_STORE='owlpost:visitor-id:v1';
+function savedReactions(){try{const value=JSON.parse(localStorage.getItem(REACTION_STORE)||'{}');return value&&typeof value==='object'?value:{}}catch{return{}}}
+function reactionMarkup(entry){
+  const key=String(entry.id||`preview:${entry.day||T}`),chosen=savedReactions()[key]||'';
+  const options=REACTIONS.map((emoji,i)=>`<button class="reaction-option" type="button" data-reaction="${emoji}" aria-label="React ${['love','with teary eyes','with a hug','with a flower','with a laugh'][i]}" aria-pressed="${chosen===emoji}" ${chosen?'disabled':''}>${emoji}</button>`).join('');
+  return`<section class="reaction" data-entry-key="${esc(key)}" data-entry-id="${esc(entry.id||'')}" aria-label="Letter reactions"><p class="reaction-label">Did this letter make you smile?</p><button class="reaction-trigger" type="button" aria-expanded="${chosen?'true':'false'}">${chosen?'Reaction sent ✨':'💌 Leave a reaction'}</button><div class="reaction-options"${chosen?'':' hidden'}>${options}</div><p class="reaction-status" role="status" aria-live="polite">${chosen?'Your reaction is saved ✨':''}</p></section>`;
+}
+
+function visitorId(){
+  let id='';
+  try{id=localStorage.getItem(VISITOR_STORE)||''}catch{}
+  if(!id){id=crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;try{localStorage.setItem(VISITOR_STORE,id)}catch{}}
+  return id;
+}
+
+$('#view').addEventListener('click',async e=>{
+  const trigger=e.target.closest('.reaction-trigger');
+  if(trigger){
+    const box=trigger.closest('.reaction');
+    const options=box.querySelector('.reaction-options');
+    options.hidden=!options.hidden;
+    trigger.setAttribute('aria-expanded',String(!options.hidden));
+    return;
+  }
+  const button=e.target.closest('.reaction-option');
+  if(!button)return;
+  const box=button.closest('.reaction'),emoji=button.dataset.reaction,status=box.querySelector('.reaction-status');
+  if(box.dataset.sent==='true'||box.dataset.busy==='true')return;
+  box.dataset.busy='true';
+  box.querySelectorAll('.reaction-option').forEach(option=>option.disabled=true);
+  if(sb&&box.dataset.entryId){
+    try{
+      const{error}=await sb.from('letter_reactions').insert({entry_id:box.dataset.entryId,visitor_id:visitorId(),reaction:emoji});
+      if(error)throw error;
+    }catch{
+      delete box.dataset.busy;box.querySelectorAll('.reaction-option').forEach(option=>option.disabled=false);
+      status.textContent='Your reaction could not be sent just yet. Please try again.';return;
+    }
+  }
+  try{localStorage.setItem(REACTION_STORE,JSON.stringify({...savedReactions(),[box.dataset.entryKey]:emoji}))}catch{}
+  delete box.dataset.busy;box.dataset.sent='true';
+  box.querySelectorAll('.reaction-option').forEach(option=>{option.disabled=true;option.setAttribute('aria-pressed',String(option===button))});
+  box.querySelector('.reaction-options').hidden=false;
+  const triggerButton=box.querySelector('.reaction-trigger');triggerButton.textContent='Reaction sent ✨';triggerButton.setAttribute('aria-expanded','true');
+  status.textContent=sb&&box.dataset.entryId?'Your reaction was delivered ✨':'Your reaction is saved on this device ✨';
+});
 
 async function route(){
   scrollTo(0,0);
