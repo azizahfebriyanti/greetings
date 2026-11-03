@@ -21,7 +21,7 @@
 :root{color-scheme:dark;--night:#0b0a14;--red:#740001;--gold:#d3a625;--gold2:#eeba30;--parch:#f1e3c3;--parch2:#dcc594;--ink:#3a2a1a;--green:#2c5a3b;--disp:"Cinzel Decorative",Georgia,serif;--cap:Cinzel,Georgia,serif;--body:"IM Fell English","Palatino Linotype",Georgia,serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;min-height:100svh;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(30px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font-family:var(--body);color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 62%),radial-gradient(ellipse at 50% 115%,#4a0b16,transparent 55%),var(--night);overflow-x:hidden}
+body{margin:0;min-height:100vh;min-height:100svh;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(30px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font-family:var(--body);color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 62%),radial-gradient(ellipse at 50% 115%,#4a0b16,transparent 55%),var(--night);overflow-x:hidden}
 #sky,#candles{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:tw var(--d) var(--l) infinite}
 @keyframes tw{50%{opacity:.05}}
@@ -35,7 +35,7 @@ h1{margin:0;font:700 clamp(2.1rem,9vw,3.6rem)/1.1 var(--disp);background:linear-
 .sub{margin:14px 0 0;font-size:1.1rem;line-height:1.6;opacity:.88}
 .seal{display:block;margin:28px auto 12px;width:94px;height:94px;border:0;border-radius:50%;cursor:pointer;font-size:2rem;color:#f6d79b;background:radial-gradient(circle at 35% 30%,#c32a32,var(--red) 62%,#360004);box-shadow:0 8px 20px #000a,inset 0 0 0 5px #8a1118,inset 0 0 0 7px #e0545a44,0 0 34px #740001cc;transition:transform .25s;-webkit-tap-highlight-color:transparent}
 .seal:hover{transform:scale(1.07) rotate(-5deg)}
-.seal:focus-visible,nav a:focus-visible,.pager button:focus-visible{outline:2px solid var(--gold2);outline-offset:4px}
+.seal:focus-visible,nav a:focus-visible,.pager button:focus-visible,.reaction button:focus-visible{outline:2px solid var(--gold2);outline-offset:4px}
 .cap{margin:0;font:500 .9rem var(--cap);letter-spacing:.05em;opacity:.75}
 nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin:30px 0 6px}
 nav a{display:block;padding:14px 8px;color:var(--parch);text-decoration:none;border:1px solid #d3a62566;border-radius:6px;background:#0b0a14aa;transition:background .25s,border-color .25s}
@@ -49,10 +49,11 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .sheet::before{content:"";position:absolute;inset:8px;border:1px solid #8c6a2f55;pointer-events:none}
 @keyframes in{from{opacity:0}}
 .date{font:500 .9rem var(--cap);letter-spacing:.04em;color:#7a5a22}
-.sheet h2{display:flex;justify-content:space-between;gap:12px;margin:.35em 0 .5em;font:700 1.45rem/1.25 var(--cap);color:var(--red)}
+.sheet h2{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;margin:.35em 0 .5em;font:700 1.45rem/1.25 var(--cap);color:var(--red);overflow-wrap:anywhere}
+.sheet h2>span:first-child{min-width:0;overflow-wrap:anywhere}
 .meta{margin:-.2em 0 .8em;font-style:italic;color:#6b4e16}
 .meta a{color:var(--red)}
-.body{font-size:1.2rem;line-height:1.75}
+.body{font-size:1.2rem;line-height:1.75;overflow-wrap:anywhere;word-break:normal}
 .letter .body{color:var(--green)}
 .body p,.body div,.body blockquote,.body h3{margin:.7em 0;unicode-bidi:plaintext}
 .body h3{font:700 1.2rem var(--cap);color:var(--red)}
@@ -136,7 +137,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 .flying-address{position:absolute;z-index:1;right:4%;bottom:10%;left:5%;overflow:hidden;color:#285940;font:500 clamp(6px,1vw,10px)/1.1 var(--body);letter-spacing:.01em;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .flying-stamp{position:absolute;z-index:1;top:5%;right:5%;display:grid;place-items:center;width:17%;aspect-ratio:1;border:1px dashed #8a3440;color:#812c39;background:#e7d2ad;font:700 clamp(7px,.9vw,10px) var(--cap)}
 @keyframes letter-swoop{0%{opacity:0;transform:translate3d(0,-8vh,0) rotateX(var(--from-flip)) rotateZ(var(--from-rotate)) scale(.48)}9%{opacity:1}30%{transform:translate3d(var(--sway-one),25vh,0) rotateX(var(--mid-flip)) rotateZ(var(--mid-rotate)) scale(var(--mid-scale))}58%{transform:translate3d(var(--sway-two),70vh,0) rotateX(var(--to-flip)) rotateZ(var(--to-rotate)) scale(var(--to-scale))}84%{opacity:1;transform:translate3d(var(--sway-three),112vh,0) rotateX(var(--mid-flip)) rotateZ(var(--from-rotate)) scale(.82)}96%{opacity:.95}100%{opacity:0;transform:translate3d(var(--sway-four),145vh,0) rotateX(var(--from-flip)) rotateZ(var(--to-rotate)) scale(.7)}}
-.letter-paper{position:relative;width:min(620px,100%);max-height:calc(100svh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));overflow:auto;padding:clamp(27px,6vw,48px) clamp(24px,7vw,58px) 30px;border:1px solid #9d8459;color:#322619;background:radial-gradient(ellipse at 14% 6%,#fff9e5aa,transparent 32%),radial-gradient(ellipse at 92% 88%,#a17b4233,transparent 36%),linear-gradient(137deg,#f6e9cf,#e9d8b7 53%,#f3e5c8);box-shadow:0 28px 76px #000c,inset 0 0 50px #a57d3e2b;opacity:0;visibility:hidden;transform:translateY(28px) scale(.96);transition:opacity .65s ease,transform .75s cubic-bezier(.2,.75,.25,1),visibility .65s;}
+.letter-paper{position:relative;width:min(620px,100%);max-height:calc(100vh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));max-height:calc(100svh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));overflow:auto;padding:clamp(27px,6vw,48px) clamp(24px,7vw,58px) 30px;border:1px solid #9d8459;color:#322619;background:radial-gradient(ellipse at 14% 6%,#fff9e5aa,transparent 32%),radial-gradient(ellipse at 92% 88%,#a17b4233,transparent 36%),linear-gradient(137deg,#f6e9cf,#e9d8b7 53%,#f3e5c8);box-shadow:0 28px 76px #000c,inset 0 0 50px #a57d3e2b;opacity:0;visibility:hidden;transform:translateY(28px) scale(.96);transition:opacity .65s ease,transform .75s cubic-bezier(.2,.75,.25,1),visibility .65s;}
 .letter-paper::before{position:absolute;inset:9px;border:1px solid #8c6a382f;content:"";pointer-events:none}
 #mailExperience[data-phase="letter"] .letter-paper{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
 .letter-heading{display:grid;justify-items:center;margin:0 auto 25px;color:#355d43;text-align:center}
@@ -155,7 +156,28 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 .mail-continue{position:relative;z-index:1;display:block;width:100%;min-height:48px;margin:23px auto 0;padding:12px 18px;border:1px solid #78613c;border-radius:2px;color:#f6ead2;background:linear-gradient(115deg,#284f3a,#356347);box-shadow:0 7px 18px #45362438;font:600 .76rem var(--cap);letter-spacing:.08em;cursor:pointer;transition:transform .2s ease,box-shadow .25s ease,background .25s ease}
 .mail-continue:hover{transform:translateY(-2px);background:linear-gradient(115deg,#315c43,#437655);box-shadow:0 10px 24px #4536244a}
 .mail-continue:active{transform:translateY(0) scale(.99)}
-@media(max-width:520px){#mailExperience{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}.mail-stage{gap:13px}.mail-object{width:100%;aspect-ratio:1.47}.mail-recipient{max-width:82%;font-size:clamp(1.2rem,6vw,1.7rem)}.letter-paper{max-height:calc(100svh - 24px);padding:27px 24px 24px}.letter-address{margin-bottom:18px}.letter-copy{line-height:1.68}}
+@media(max-width:520px){
+  body{padding:max(16px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+  h1{font-size:clamp(1.85rem,9vw,2.75rem)}
+  nav{grid-template-columns:repeat(auto-fit,minmax(min(100%,128px),1fr));gap:8px;margin-top:24px}
+  nav a{min-height:78px;padding:12px 6px}
+  .head{font-size:1.05rem}
+  .sheet{margin:14px 0;padding:27px 18px}
+  .sheet h2{font-size:clamp(1.1rem,5vw,1.4rem)}
+  .body{font-size:1.08rem;line-height:1.68}
+  .body img{border-width:4px}
+  .pager{gap:8px}
+  .pager button{min-height:44px;padding:9px 12px}
+  .reaction-trigger{min-height:44px;width:min(100%,290px)}
+  #mailExperience{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  .mail-stage{gap:13px}
+  .mail-object{width:100%;aspect-ratio:1.47}
+  .mail-recipient{max-width:82%;font-size:clamp(1.2rem,6vw,1.7rem)}
+  .letter-paper{max-height:calc(100vh - 24px);max-height:calc(100svh - 24px);padding:27px 24px 24px}
+  .letter-address{margin-bottom:18px}
+  .letter-copy{line-height:1.68}
+}
+@media(max-width:360px){.sheet{padding:23px 15px}.reaction-options{gap:6px}.reaction-option{width:42px;height:42px}}
 @media(max-height:520px) and (orientation:landscape){#mailExperience{place-items:start center}.mail-stage{margin:auto}.mail-object{width:min(490px,70vw);aspect-ratio:1.62}.letter-paper{max-height:calc(100svh - 20px)}}
 @media(prefers-reduced-motion:reduce){#mailExperience,.mail-object,.mail-object__inner,.mail-face,.letter-paper,.mail-hint,.mail-continue,.mail-storm{animation:none!important;transition:none!important}.flying-envelope{display:none!important}}
 </style>

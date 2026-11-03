@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>staff room ✒️</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap">
@@ -10,8 +10,8 @@
 :root{color-scheme:dark;--gold:#d3a625;--red:#740001;--parch:#f1e3c3;--ink:#3a2a1a}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;padding:20px 16px 60px;font:1.05rem "IM Fell English",Georgia,serif;color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 60%),radial-gradient(ellipse at 50% 120%,#4a0b16,transparent 55%),#0b0a14}
-body.login-screen{display:grid;place-items:center;min-height:100svh;padding:max(22px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom));overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 12%,#262e70 0,transparent 45%),radial-gradient(ellipse at 50% 100%,#490b24 0,transparent 48%),#080811}
+body{margin:0;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(60px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font:1.05rem "IM Fell English",Georgia,serif;color:var(--parch);background:radial-gradient(ellipse at 50% -10%,#232a63,transparent 60%),radial-gradient(ellipse at 50% 120%,#4a0b16,transparent 55%),#0b0a14}
+body.login-screen{display:grid;place-items:center;min-height:100vh;min-height:100svh;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow-x:hidden;overflow-y:auto;isolation:isolate;background:radial-gradient(ellipse at 50% 12%,#262e70 0,transparent 45%),radial-gradient(ellipse at 50% 100%,#490b24 0,transparent 48%),#080811}
 body.login-screen::before,body.login-screen::after{position:fixed;inset:-20%;z-index:-1;pointer-events:none;content:""}
 body.login-screen::before{opacity:.72;background:radial-gradient(2px 2px at 12% 22%,#fff9,transparent 70%),radial-gradient(1px 1px at 27% 76%,#f5d58f,transparent 70%),radial-gradient(2px 2px at 52% 33%,#fff8,transparent 70%),radial-gradient(1px 1px at 75% 18%,#fff9,transparent 70%),radial-gradient(2px 2px at 88% 69%,#f5d58f99,transparent 70%),radial-gradient(1px 1px at 63% 88%,#fff9,transparent 70%);background-size:320px 260px;animation:login-stars 24s linear infinite}
 body.login-screen::after{inset:0;opacity:.62;background:radial-gradient(ellipse at 50% 48%,transparent 18%,#08081188 75%),radial-gradient(ellipse at 16% 50%,#751b3b35,transparent 36%),radial-gradient(ellipse at 84% 38%,#3c4da344,transparent 40%);animation:login-glow 9s ease-in-out infinite alternate}
@@ -32,7 +32,7 @@ body.login-screen #login{animation:login-arrive .7s cubic-bezier(.2,.75,.25,1) b
 @keyframes login-arrive{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 h1{margin:10px 0;font:700 1.5rem Cinzel,serif;color:var(--gold);text-align:center}
 input,select,button{width:100%;padding:11px 12px;font:inherit;color:var(--parch);background:#14112a;border:1px solid #d3a62588;border-radius:5px}
-button{width:auto;cursor:pointer;font:700 .95rem Cinzel,serif}
+button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #save{background:var(--red)}
 .tabs,.tools,.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tabs button,.tools button{padding:9px 12px}
@@ -55,6 +55,28 @@ li{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #
 li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 li button{padding:4px 9px;background:none}
 @media(prefers-reduced-motion:reduce){body.login-screen::before,body.login-screen::after,#login{animation:none!important;transition:none!important}}
+@media(max-width:600px){
+  body{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+  main{width:100%;gap:12px}
+  #login{padding:30px 22px}
+  .tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .tabs button{width:100%;min-height:46px;padding:9px 6px;font-size:.78rem;line-height:1.25}
+  .tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .tools button{width:100%;min-height:44px;padding:8px 4px;font-size:.73rem;line-height:1.2}
+  #ed{min-height:42vh;min-height:42svh;padding:14px;font-size:1.05rem;overflow-wrap:anywhere}
+  #ed img,#ed audio,#ed video{max-width:100%}
+  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #save,#new{width:100%;min-height:46px}
+  #st{grid-column:1/-1;min-width:0;overflow-wrap:anywhere}
+  #out{grid-column:1/-1;width:100%;margin:0!important}
+  li{min-width:0}
+  #recent li span{min-width:0;white-space:normal;overflow-wrap:anywhere}
+  .draft-open{min-width:0}
+  .draft-open span{white-space:normal;overflow-wrap:anywhere}
+  #reactions li{flex-wrap:wrap}
+  #reactions small{width:100%;padding-left:8px}
+}
+@media(max-width:360px){#login{padding:27px 17px}.tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body class="login-screen">
