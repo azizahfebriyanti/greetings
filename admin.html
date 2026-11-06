@@ -171,6 +171,7 @@ li button{padding:4px 9px;background:none}
     <button type="button" id="pic">📷 Photo</button>
     <input type="file" id="file" accept="image/*" hidden>
     <button type="button" id="voice" hidden>🎙 Add audio</button>
+    <button type="button" id="removeSongAudio" hidden>🗑 Remove song MP3</button>
     <input type="file" id="voiceFile" accept="audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm" hidden>
     <button type="button" id="recordVoice" hidden>⏺ Record live</button>
     <button type="button" id="stopRecording" hidden>■ Stop recording</button>
@@ -389,12 +390,13 @@ function form(k,row,options={}){
     :`<input id="x_${n}" placeholder="${p}">`).join('');
   v[3].forEach(([n])=>{if(m[n]!=null)$('#x_'+n).value=m[n]});
   ed.innerHTML=source.body||'';
+  syncSongAudioControl();
   placeCoords=k==='place'&&Number.isFinite(+m.lat)&&Number.isFinite(+m.lng)?{lat:+m.lat,lng:+m.lng}:null;
   $('#placePicker').hidden=k!=='place';
   $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||k!=='letter';$('#video').hidden=DEMO_MODE||k!=='letter';$('#pic').hidden=DEMO_MODE;
   $('#voice').textContent=k==='song'?'🎵 Upload song MP3':'🎙 Add voice note';
   $('#voiceFile').accept=k==='song'?'.mp3,audio/mpeg':'audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm';
-  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
+  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls. Use Remove song MP3, then Save, to delete it.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
   $('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
   $('#recordVoice').textContent='⏺ Record live';
   formReady=true;
@@ -402,6 +404,19 @@ function form(k,row,options={}){
   st(draft?'Draft restored. Save when it is ready.':row?'Editing. Save updates this entry.':'');
   renderDrafts();
   if(k==='place')initPlacePicker();
+}
+
+function mediaPathsFromHtml(html){
+  if(!C.url)return[];
+  try{
+    const root=new URL(C.url),doc=new DOMParser().parseFromString(html||'','text/html'),marker='/storage/v1/object/public/media/';
+    return Array.from(doc.querySelectorAll('audio[src]')).map(audio=>{
+      const url=new URL(audio.getAttribute('src'),root);
+      if(url.origin!==root.origin)return null;
+      const index=url.pathname.indexOf(marker);
+      return index<0?null:decodeURIComponent(url.pathname.slice(index+marker.length));
+    }).filter(Boolean);
+  }catch{return[]}
 }
 
 // ---- editor: remember the caret so a photo can land anywhere in the text
@@ -471,6 +486,12 @@ async function shrink(f){
 }
 $('#pic').onclick=()=>$('#file').click();
 $('#voice').onclick=()=>$('#voiceFile').click();
+function syncSongAudioControl(){const button=$('#removeSongAudio');if(button)button.hidden=cur!=='song'||!ed.querySelector('audio')}
+$('#removeSongAudio').onclick=()=>{
+  const tracks=ed.querySelectorAll('audio');if(!tracks.length)return;
+  tracks.forEach(track=>{const parent=track.parentElement;track.remove();if(parent?.tagName==='P'&&!parent.textContent.trim()&&!parent.children.length)parent.remove()});syncSongAudioControl();scheduleDraft();
+  st('Song MP3 removed from this entry. Save to publish the change.');
+};
 $('#video').onclick=()=>$('#videoFile').click();
 async function addPhoto(file){
   if(DEMO_MODE)return st('Photo uploads need the connected admin. Local demo mode does not upload files.');
@@ -501,7 +522,7 @@ async function addMedia(file,kind){
   const local=URL.createObjectURL(file),media=document.createElement(kind);
   media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
   if(kind==='video')media.playsInline=true;
-  put(media);st(`Uploading ${kind==='audio'?(cur==='song'?'song MP3':'voice note'):'video'}…`);
+  put(media);syncSongAudioControl();st(`Uploading ${kind==='audio'?(cur==='song'?'song MP3':'voice note'):'video'}…`);
   try{
     const ext=extension||((file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase());
     const name=crypto.randomUUID()+'.'+ext;
@@ -511,7 +532,7 @@ async function addMedia(file,kind){
     if(error)throw error;
     media.src=sb.storage.from('media').getPublicUrl(name).data.publicUrl;
     media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?(cur==='song'?'Song MP3 added.':'Voice note added.'):'Video added.');scheduleDraft();
-  }catch(x){media.remove();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
+  }catch(x){media.remove();syncSongAudioControl();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
 }
 $('#voiceFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'audio')};
 $('#videoFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'video')};
@@ -560,10 +581,15 @@ $('#save').onclick=async()=>{
     try{localStorage.setItem(DEMO_ENTRIES,JSON.stringify(updated))}catch{return st('This browser could not save the local demo entry.')}
     const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();st('Saved in this browser ✨');return;
   }
+  const previous=edit?rows.find(entry=>entry.id===edit):null;
+  const newAudioPaths=new Set(mediaPathsFromHtml(row.body));
+  const removedSongPaths=cur==='song'&&previous?mediaPathsFromHtml(previous.body).filter(path=>!newAudioPaths.has(path)):[];
   st('Saving…');
   const{error}=edit?await sb.from('entries').update(row).eq('id',edit):await sb.from('entries').insert(row);
   if(error)return st(error.message);
-  const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentReactions();st('Saved ✨');
+  let mediaCleanupError='';
+  if(removedSongPaths.length){try{const{error:cleanupError}=await sb.storage.from('media').remove(removedSongPaths);if(cleanupError)mediaCleanupError=cleanupError.message}catch(cleanupError){mediaCleanupError=cleanupError?.message||'network error'}}
+  const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentReactions();st(mediaCleanupError?`Saved; removed from the page, but MP3 storage cleanup failed: ${mediaCleanupError}`:'Saved ✨');
 };
 $('#new').onclick=()=>{stashDraft();form(cur,null,{fresh:true})};
 
@@ -616,9 +642,12 @@ async function boot(){
     recent();recentReactions();loadEvents();return;
   }
   const{data:{session}}=await sb.auth.getSession();
-  $('#login').hidden=!!session;$('#app').hidden=!session;
-  document.body.classList.toggle('login-screen',!session);
-  if(session){
+  const adminEmail=String(C.adminEmail||'azizahfebriyanti20@gmail.com').trim().toLowerCase();
+  const isAdmin=!!session&&String(session.user?.email||'').toLowerCase()===adminEmail;
+  if(session&&!isAdmin){await sb.auth.signOut();$('#err').textContent='This account does not have Staff Room access.'}
+  $('#login').hidden=isAdmin;$('#app').hidden=!isAdmin;
+  document.body.classList.toggle('login-screen',!isAdmin);
+  if(isAdmin){
     const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
     const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
     form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});

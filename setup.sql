@@ -1,11 +1,11 @@
 -- SETUP (about 10 minutes, all free). Re-run this file after app/database updates.
--- 1. supabase.com > New project. Authentication > Sign In / Providers: turn OFF "Allow new users to sign up".
--- 2. Authentication > Users > Add user: your email + a strong password. This is the only login that can write.
--- 3. Replace YOUR_EMAIL below (3 places) with that same email, paste this whole file into SQL Editor, Run.
--- 4. Project Settings > API: copy the Project URL and the public key into config.js.
+-- 1. Authentication > Sign In / Providers: turn OFF "Allow new users to sign up".
+-- 2. Authentication > Users: keep your admin account and add one separate Satrio account.
+--    Use the same Satrio email as CFG.visitorEmail in config.js; set a strong password for him.
+-- 3. Replace both email addresses below with CFG.adminEmail and CFG.visitorEmail from config.js, then run this in SQL Editor.
+-- 4. Keep the public anon/publishable key in config.js. Never put a service_role key in browser code.
 -- 5. Put index.html, admin.html and config.js on GitHub Pages (or Netlify / Vercel / Cloudflare Pages).
---    Rename admin.html to something only you know, and never link to it.
--- Your letters and photos live in Supabase, not in the repo, so pushing the code to GitHub does not expose them.
+-- The database only returns entries and special days to signed-in accounts; only the admin can write.
 
 create table if not exists entries (
   id uuid primary key default gen_random_uuid(),
@@ -20,7 +20,10 @@ create table if not exists entries (
 alter table entries enable row level security;
 
 drop policy if exists "anyone can read" on entries;
-create policy "anyone can read" on entries for select using (true);
+drop policy if exists "only invited accounts can read entries" on entries;
+create policy "only invited accounts can read entries" on entries for select to authenticated using (
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
+);
 
 drop policy if exists "only the owner writes" on entries;
 create policy "only the owner writes" on entries for all to authenticated
@@ -29,7 +32,8 @@ create policy "only the owner writes" on entries for all to authenticated
 
 -- Supabase no longer exposes new tables to its API automatically (2026), so grant access explicitly.
 -- The policies above still decide who may do what; these lines only let the requests reach the table.
-grant select on public.entries to anon, authenticated;
+revoke select on public.entries from anon;
+grant select on public.entries to authenticated;
 grant insert, update, delete on public.entries to authenticated;
 
 -- A reader can leave one emoji reaction per browser for each letter.
@@ -55,11 +59,12 @@ alter table letter_reactions add column if not exists accuracy double precision;
 alter table letter_reactions enable row level security;
 drop policy if exists "anyone can add letter reactions" on letter_reactions;
 create policy "anyone can add letter reactions" on letter_reactions
-  for insert to anon, authenticated with check (
+  for insert to authenticated with check (
     char_length(visitor_id) between 1 and 120
     and (latitude is null or latitude between -90 and 90)
     and (longitude is null or longitude between -180 and 180)
     and (accuracy is null or accuracy >= 0)
+    and lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
   );
 drop policy if exists "only the owner can read letter reactions" on letter_reactions;
 create policy "only the owner can read letter reactions" on letter_reactions
@@ -69,7 +74,8 @@ create policy "only the owner can delete letter reactions" on letter_reactions
   for delete to authenticated using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
 revoke all on table public.letter_reactions from anon, authenticated;
 grant select on public.letter_reactions to authenticated;
-grant insert on public.letter_reactions to anon, authenticated;
+revoke insert on public.letter_reactions from anon;
+grant insert on public.letter_reactions to authenticated;
 grant delete on public.letter_reactions to authenticated;
 
 -- Public, editable-by-owner content for countdowns and special-day greetings.
@@ -81,8 +87,11 @@ create table if not exists public.site_settings (
 
 alter table public.site_settings enable row level security;
 drop policy if exists "anyone can read site settings" on public.site_settings;
-create policy "anyone can read site settings" on public.site_settings
-  for select to anon, authenticated using (true);
+drop policy if exists "only invited accounts can read site settings" on public.site_settings;
+create policy "only invited accounts can read site settings" on public.site_settings
+  for select to authenticated using (
+    lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
+  );
 drop policy if exists "only the owner inserts site settings" on public.site_settings;
 create policy "only the owner inserts site settings" on public.site_settings
   for insert to authenticated with check ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
@@ -91,7 +100,8 @@ create policy "only the owner updates site settings" on public.site_settings
   for update to authenticated using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com')
   with check ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
 revoke all on table public.site_settings from anon, authenticated;
-grant select on public.site_settings to anon, authenticated;
+revoke select on public.site_settings from anon;
+grant select on public.site_settings to authenticated;
 grant insert, update on public.site_settings to authenticated;
 
 insert into storage.buckets (id, name, public)
@@ -110,6 +120,10 @@ on conflict (id) do update set public = excluded.public, file_size_limit = exclu
 drop policy if exists "only the owner uploads letter media" on storage.objects;
 create policy "only the owner uploads letter media" on storage.objects for insert to authenticated
   with check (bucket_id = 'media' and (auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
+
+drop policy if exists "only the owner deletes letter media" on storage.objects;
+create policy "only the owner deletes letter media" on storage.objects for delete to authenticated
+  using (bucket_id = 'media' and (auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
 
 -- Refresh the REST API's schema cache so the new table and columns appear immediately.
 notify pgrst, 'reload schema';

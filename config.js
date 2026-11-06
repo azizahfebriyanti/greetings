@@ -6,6 +6,9 @@ window.CFG = {
   url: "https://taoukekwxdnrlunbheww.supabase.co",
   key: "sb_publishable_hgtq6LDKBp7uk8EMLyGcDg_zYWHhShd",
   name: "Kak Satrio",
+  // This email identifies Satrio's Supabase Auth account; the page asks only for its password.
+  visitorEmail: "satriods547@gmail.com",
+  adminEmail: "azizahfebriyanti20@gmail.com",
   // Edit these strings to personalize the opening letter.
   letter: {
     recipient: "MR. S. D. SETYAWAN",
