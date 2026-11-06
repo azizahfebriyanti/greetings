@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <title>staff room ✒️</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
 :root{color-scheme:dark;--gold:#d3a625;--red:#740001;--parch:#f1e3c3;--ink:#3a2a1a}
 *{box-sizing:border-box}
@@ -39,6 +40,28 @@ button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;to
 .tabs .on{background:var(--red);border-color:var(--gold)}
 #extra{display:grid;gap:10px}
 .editor-note{margin:0;font-size:.85rem;opacity:.72}
+#placePicker{margin:0;padding:13px;border:1px solid #d3a62566;border-radius:5px;background:#12111f}
+#placePicker legend{padding:0 7px;color:var(--gold);font:500 .83rem Cinzel,serif}
+#placePicker p{margin:3px 0 9px;font-size:.86rem;opacity:.8}
+#placePickerMap{height:340px;width:100%;background:#ddd5c2;border:1px solid #b29452}
+#placeCoordinates{display:block;min-height:1.3em;margin-top:8px;color:#eeba30;font: .82rem system-ui,sans-serif}
+.leaflet-container{font-family:"IM Fell English",Georgia,serif}
+.leaflet-control-attribution{font:11px/1.3 system-ui,sans-serif}
+.special-settings{padding:16px;border:1px solid #d3a62555;background:linear-gradient(145deg,#161527dd,#0e0d19ee);box-shadow:0 12px 35px #0005}
+#demoBanner{padding:11px 14px;border:1px solid #eeba3088;color:#f4d994;background:#5b3c1555;font:.85rem/1.5 system-ui,sans-serif}
+.special-settings h2{margin:0 0 5px;color:var(--gold);font:700 1.05rem Cinzel,serif}
+.special-settings>p{margin:0 0 12px;font-size:.88rem;opacity:.75}
+#eventRows{display:grid;gap:10px}
+.event-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(145px,.8fr) auto;gap:8px;align-items:center;padding:10px;border:1px solid #d3a62533;background:#09091488}
+.event-row input{min-width:0}
+.event-row .event-greeting{grid-column:1/3}
+.event-repeat{display:flex;align-items:center;gap:7px;font: .78rem system-ui,sans-serif}
+.event-repeat input{width:20px;min-height:20px;margin:0;accent-color:#d3a625}
+.event-delete{min-width:40px;background:#310b1d}
+.settings-controls{margin-top:10px}
+#recordStatus{min-height:1.3em;grid-column:1/-1;color:#eeba30;font:.84rem system-ui,sans-serif}
+#reactions .reaction-context{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;color:#cbb98f;font:.76rem system-ui,sans-serif}
+#reactions .reaction-context a{color:#eeba30}
 #ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
 #ed:focus{outline-color:var(--gold)}
 #ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
@@ -65,6 +88,12 @@ li button{padding:4px 9px;background:none}
   .tools button{width:100%;min-height:44px;padding:8px 4px;font-size:.73rem;line-height:1.2}
   #ed{min-height:42vh;min-height:42svh;padding:14px;font-size:1.05rem;overflow-wrap:anywhere}
   #ed img,#ed audio,#ed video{max-width:100%}
+  #placePickerMap{height:48svh;min-height:290px}
+  .event-row{grid-template-columns:minmax(0,1fr) auto}
+  .event-row input:not(.event-greeting){grid-column:1/-1}
+  .event-row .event-greeting{grid-column:1/-1}
+  .event-repeat{grid-column:1}
+  .event-delete{grid-column:2;grid-row:4}
   .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   #save,#new{width:100%;min-height:46px}
   #st{grid-column:1/-1;min-width:0;overflow-wrap:anywhere}
@@ -89,10 +118,23 @@ li button{padding:4px 9px;background:none}
 </main>
 <main id="app" hidden>
   <h1>✒️ Staff Room</h1>
+  <p id="demoBanner" hidden>Local demo mode — entries and special days save in this browser and appear on <code>index.html?demo=1</code>. Supabase reactions and media uploads are disabled.</p>
+  <section class="special-settings" aria-labelledby="specialTitle">
+    <h2 id="specialTitle">✨ Special days &amp; Hogwarts Express</h2>
+    <p>Add birthdays, anniversaries, Eid, or your next meeting. Today’s greeting replaces “Happy Friday!”; the nearest event appears as a countdown.</p>
+    <div id="eventRows"></div>
+    <div class="row settings-controls"><button type="button" id="addEvent">＋ Add a special day</button><button type="button" id="saveEvents">Save special days</button><span id="settingsStatus" role="status" aria-live="polite"></span></div>
+  </section>
   <div class="tabs" id="tabs"></div>
   <input type="date" id="day" aria-label="date shown on the page">
   <input id="title">
   <div id="extra"></div>
+  <fieldset id="placePicker" hidden>
+    <legend>📍 Pin this visit on the map</legend>
+    <p>Tap or click the map to choose the place. That pin will appear on the Marauder’s Map in visit order.</p>
+    <div id="placePickerMap" role="application" aria-label="Choose the place location on OpenStreetMap"></div>
+    <span id="placeCoordinates">No map pin selected.</span>
+  </fieldset>
   <div class="tools" id="tools">
     <button type="button" data-c="bold"><b>B</b></button>
     <button type="button" data-c="italic"><i>I</i></button>
@@ -100,12 +142,15 @@ li button{padding:4px 9px;background:none}
     <button type="button" data-c="q">Quote</button>
     <button type="button" id="pic">📷 Photo</button>
     <input type="file" id="file" accept="image/*" hidden>
-    <button type="button" id="voice" hidden>🎙 Voice note</button>
-    <input type="file" id="voiceFile" accept="audio/*" hidden>
+    <button type="button" id="voice" hidden>🎙 Add audio</button>
+    <input type="file" id="voiceFile" accept="audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm" hidden>
+    <button type="button" id="recordVoice" hidden>⏺ Record live</button>
+    <button type="button" id="stopRecording" hidden>■ Stop recording</button>
     <button type="button" id="video" hidden>🎥 Video</button>
     <input type="file" id="videoFile" accept="video/*" hidden>
   </div>
-  <p class="editor-note">Tip: use Photo, or paste a copied image into the editor with Ctrl+V. Letter entries can also include a voice note or video.</p>
+  <p class="editor-note">Tip: use Photo or paste a copied image with Ctrl+V. Letter and song entries accept .m4a audio, uploaded recordings, or a new live voice recording.</p>
+  <p id="recordStatus" role="status" aria-live="polite"></p>
   <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
   <p id="draftState" class="draft-state" role="status" aria-live="polite"></p>
   <div class="row">
@@ -123,24 +168,28 @@ li button{padding:4px 9px;background:none}
 </main>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 const $=s=>document.querySelector(s),C=window.CFG||{},T=new Date().toLocaleDateString('en-CA');
-if(!C.url||!window.supabase){document.body.innerHTML='<p style="padding:30px">Fill in config.js first (see setup.sql).</p>';throw new Error('no config')}
-const sb=supabase.createClient(C.url,C.key);
+const LOCAL_HOST=location.protocol==='file:'||['localhost','127.0.0.1','::1'].includes(location.hostname);
+const DEMO_MODE=LOCAL_HOST&&new URLSearchParams(location.search).get('demo')==='1';
+if(!DEMO_MODE&&(!C.url||!window.supabase)){document.body.innerHTML='<p style="padding:30px">Fill in config.js first (see setup.sql).</p>';throw new Error('no config')}
+const sb=DEMO_MODE?null:supabase.createClient(C.url,C.key),DEMO_ENTRIES='owlpost:local-admin-demo-entries:v1',DEMO_SETTINGS='owlpost:local-admin-demo-settings:v1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const txt=h=>new DOMParser().parseFromString(h||'','text/html').body.textContent;
 const st=t=>{$('#st').textContent=t||''};
+function readDemoEntries(){try{const items=JSON.parse(localStorage.getItem(DEMO_ENTRIES)||'[]');return Array.isArray(items)?items:[]}catch{return[]}}
 
 // kind: [icon, label, title placeholder (null = no title), extra fields]
 const K={
   letter:['✉️','Letter','Title (optional), e.g. Dear you,',[]],
-  song:['🎶','Song','Song title',[['artist','Artist'],['link','Spotify / YouTube link']]],
+  song:['🎶','Song','Song title',[['artist','Artist'],['link','Spotify / YouTube or direct audio URL']]],
   hadith:['📜','Hadith','Label (optional)',[['source','Source, e.g. Sahih Bukhari 1']]],
   reason:['🪞','Reason',null,[]],
   place:['🗺️','Place','Place name',[['rating']]]
 };
 const ed=$('#ed'),DRAFT_STORE='owlpost:staff-drafts:v1',LAST_DRAFT_STORE='owlpost:staff-last-draft:v1';
-let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0;
+let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0,placePickerMap=null,placeMarker=null,placeCoords=null,eventDrafts=[],recording=null,recordingStream=null,recordingParts=[],recordingTimer=0,recordingStarted=0;
 const newId=()=>crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;
 function readDrafts(){try{const value=JSON.parse(localStorage.getItem(DRAFT_STORE)||'{}');return value&&typeof value==='object'?value:{}}catch{return{}}}
 function writeDrafts(value){try{localStorage.setItem(DRAFT_STORE,JSON.stringify(value));return true}catch{$('#draftState').textContent='Could not save this draft on the device.';return false}}
@@ -160,8 +209,63 @@ function chooseDraftKey(k,row){
 function currentMeta(){
   const meta={};
   K[cur][3].forEach(([n])=>{const input=$('#x_'+n);if(input){const value=input.value.trim();meta[n]=n==='rating'?+value:value}});
+  if(cur==='place'&&placeCoords){meta.lat=placeCoords.lat;meta.lng=placeCoords.lng}
   return meta;
 }
+
+function updatePlaceMarker(lat,lng){
+  placeCoords=Number.isFinite(+lat)&&Number.isFinite(+lng)?{lat:+lat,lng:+lng}:null;
+  if($('#placeCoordinates'))$('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
+  if(!placePickerMap)return;
+  if(placeMarker)placeMarker.remove();
+  if(placeCoords){placeMarker=L.marker([placeCoords.lat,placeCoords.lng]).addTo(placePickerMap).bindPopup('This visit is pinned here.');placePickerMap.setView([placeCoords.lat,placeCoords.lng],Math.max(placePickerMap.getZoom(),14))}
+}
+function initPlacePicker(){
+  if(!window.L){$('#placeCoordinates').textContent='Map unavailable. Check your connection and reload.';return}
+  if(!placePickerMap){
+    placePickerMap=L.map('placePickerMap',{scrollWheelZoom:false}).setView([-6.2,106.816666],11);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(placePickerMap);
+    placePickerMap.on('click',event=>{updatePlaceMarker(event.latlng.lat,event.latlng.lng);scheduleDraft()});
+  }
+  requestAnimationFrame(()=>{placePickerMap.invalidateSize();updatePlaceMarker(placeCoords?.lat,placeCoords?.lng)});
+}
+
+function renderEventRows(){
+  $('#eventRows').innerHTML=eventDrafts.length?eventDrafts.map((item,index)=>`<div class="event-row" data-event-row="${index}" data-id="${esc(item.id||'')}">
+    <input data-event-name value="${esc(item.name||'')}" placeholder="e.g. Satrio’s birthday" aria-label="Special day name">
+    <input data-event-date type="date" value="${esc(item.date||'')}" aria-label="Special day date">
+    <label class="event-repeat"><input data-event-repeat type="checkbox" ${item.repeat?'checked':''}> Repeat yearly</label>
+    <input class="event-greeting" data-event-greeting value="${esc(item.greeting||'')}" placeholder="Greeting to show that day (e.g. Happy birthday!)" aria-label="Greeting for that day">
+    <button class="event-delete" type="button" data-event-delete="${index}" aria-label="Remove special day">✕</button>
+  </div>`).join(''):'<p class="editor-note">No special days saved yet.</p>';
+}
+function collectEventRows(){
+  return Array.from($('#eventRows').querySelectorAll('.event-row')).map(row=>({
+    id:row.dataset.id||newId(),name:row.querySelector('[data-event-name]').value.trim(),date:row.querySelector('[data-event-date]').value,
+    repeat:row.querySelector('[data-event-repeat]').checked,greeting:row.querySelector('[data-event-greeting]').value.trim()
+  }));
+}
+$('#addEvent').onclick=()=>{eventDrafts=collectEventRows();eventDrafts.push({id:newId(),name:'',date:'',repeat:false,greeting:''});renderEventRows()};
+$('#eventRows').onclick=e=>{
+  const button=e.target.closest('[data-event-delete]');if(!button)return;
+  eventDrafts=collectEventRows();eventDrafts.splice(+button.dataset.eventDelete,1);renderEventRows();
+};
+async function loadEvents(){
+  if(DEMO_MODE){try{const saved=JSON.parse(localStorage.getItem(DEMO_SETTINGS)||'{"events":[]}');eventDrafts=Array.isArray(saved.events)?saved.events:[]}catch{eventDrafts=[]}renderEventRows();$('#settingsStatus').textContent='Local demo settings.';return}
+  $('#settingsStatus').textContent='Loading…';
+  const{data,error}=await sb.from('site_settings').select('value').eq('id','special-days').maybeSingle();
+  if(error){$('#settingsStatus').textContent='Run the updated setup.sql to enable special days.';return}
+  eventDrafts=Array.isArray(data?.value?.events)?data.value.events:[];renderEventRows();$('#settingsStatus').textContent='Saved to the greeting site.';
+}
+$('#saveEvents').onclick=async()=>{
+  const events=collectEventRows();
+  if(events.some(item=>!item.name||!item.date)){$('#settingsStatus').textContent='Each special day needs a name and date.';return}
+  if(DEMO_MODE){try{localStorage.setItem(DEMO_SETTINGS,JSON.stringify({events}));eventDrafts=events;renderEventRows();$('#settingsStatus').textContent='Special days saved in this browser ✨'}catch{$('#settingsStatus').textContent='This browser could not save the demo settings.'}return}
+  $('#settingsStatus').textContent='Saving…';
+  const{error}=await sb.from('site_settings').upsert({id:'special-days',value:{events},updated_at:new Date().toISOString()});
+  if(error){$('#settingsStatus').textContent=`Could not save: ${error.message}. Run the updated setup.sql if this is the first save.`;return}
+  eventDrafts=events;renderEventRows();$('#settingsStatus').textContent='Special days saved ✨';
+};
 function stashDraft(){
   if(!formReady||$('#app').hidden)return;
   clearTimeout(draftTimer);draftTimer=0;
@@ -204,11 +308,17 @@ function form(k,row,options={}){
     :`<input id="x_${n}" placeholder="${p}">`).join('');
   v[3].forEach(([n])=>{if(m[n]!=null)$('#x_'+n).value=m[n]});
   ed.innerHTML=source.body||'';
-  $('#voice').hidden=k!=='letter';$('#video').hidden=k!=='letter';
+  placeCoords=k==='place'&&Number.isFinite(+m.lat)&&Number.isFinite(+m.lng)?{lat:+m.lat,lng:+m.lng}:null;
+  $('#placePicker').hidden=k!=='place';
+  $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#video').hidden=DEMO_MODE||k!=='letter';$('#pic').hidden=DEMO_MODE;
+  $('#voice').textContent=k==='song'?'🎵 Add song audio':'🎙 Add voice note';
+  $('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
+  $('#recordVoice').textContent=k==='song'?'🎵 Record song audio':'⏺ Record live';
   formReady=true;
   $('#draftState').textContent=draft?'Restored draft from this device.':'Changes autosave on this device.';
   st(draft?'Draft restored. Save when it is ready.':row?'Editing. Save updates this entry.':'');
   renderDrafts();
+  if(k==='place')initPlacePicker();
 }
 
 // ---- editor: remember the caret so a photo can land anywhere in the text
@@ -280,6 +390,7 @@ $('#pic').onclick=()=>$('#file').click();
 $('#voice').onclick=()=>$('#voiceFile').click();
 $('#video').onclick=()=>$('#videoFile').click();
 async function addPhoto(file){
+  if(DEMO_MODE)return st('Photo uploads need the connected admin. Local demo mode does not upload files.');
   const img=new Image(),local=URL.createObjectURL(file);
   img.alt='';img.src=local;img.style.opacity='.45';put(img);
   st('Uploading photo…');
@@ -295,32 +406,76 @@ async function addPhoto(file){
 }
 $('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addPhoto(f)};
 async function addMedia(file,kind){
-  const expected=kind==='audio'?'audio/':'video/';
-  if(cur!=='letter'||!file.type.startsWith(expected))return st(`Choose a ${kind} file for a letter.`);
+  if(DEMO_MODE)return st('Audio and video uploads need the connected admin. Local demo mode does not upload files.');
+  const extension=(file.name.match(/\.([a-z0-9]{1,8})$/i)||[])[1]?.toLowerCase()||'';
+  const audioExtension=['m4a','mp3','aac','wav','ogg','opus','caf','flac','webm','weba','mp4'];
+  const isAudio=file.type.startsWith('audio/')||extension==='m4a'||(!file.type.startsWith('video/')&&audioExtension.includes(extension));
+  const isVideo=file.type.startsWith('video/')||(!file.type.startsWith('audio/')&&['mp4','mov','m4v','webm','ogv'].includes(extension));
+  if(kind==='audio'&&(cur!=='letter'&&cur!=='song'||!isAudio))return st('Choose an audio file (.m4a, .mp3, .wav, or another audio format).');
+  if(kind==='video'&&(cur!=='letter'||!isVideo))return st('Choose a video file for a letter.');
   if(file.size>100*1024*1024)return st('Media files must be 100 MB or smaller.');
   const local=URL.createObjectURL(file),media=document.createElement(kind);
   media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
   if(kind==='video')media.playsInline=true;
-  put(media);st(`Uploading ${kind==='audio'?'voice note':'video'}…`);
+  put(media);st(`Uploading ${kind==='audio'?(cur==='song'?'song audio':'voice note'):'video'}…`);
   try{
-    const extension=(file.name.match(/\.[a-z0-9]{1,8}$/i)||[])[0]||'.'+(file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase();
-    const name=crypto.randomUUID()+extension;
-    const{error}=await sb.storage.from('media').upload(name,file,{contentType:file.type||'application/octet-stream'});
+    const ext=extension||((file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase());
+    const name=crypto.randomUUID()+'.'+ext;
+    const types={m4a:'audio/mp4',mp4:kind==='audio'?'audio/mp4':'video/mp4',mp3:'audio/mpeg',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',opus:'audio/ogg',caf:'audio/x-caf',flac:'audio/flac',webm:kind==='audio'?'audio/webm':'video/webm',weba:'audio/webm',mov:'video/quicktime',m4v:'video/mp4',ogv:'video/ogg'};
+    const contentType=kind==='audio'?(file.type.startsWith('audio/')&&ext!=='m4a'?file.type:(types[ext]||file.type||'application/octet-stream')):(file.type.startsWith('video/')?file.type:(types[ext]||file.type||'application/octet-stream'));
+    const{error}=await sb.storage.from('media').upload(name,file,{contentType});
     if(error)throw error;
     media.src=sb.storage.from('media').getPublicUrl(name).data.publicUrl;
-    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?'Voice note added.':'Video added.');scheduleDraft();
+    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?(cur==='song'?'Song audio added.':'Voice note added.'):'Video added.');scheduleDraft();
   }catch(x){media.remove();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
 }
 $('#voiceFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'audio')};
 $('#videoFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'video')};
 
+function stopTracks(){if(recordingStream){recordingStream.getTracks().forEach(track=>track.stop());recordingStream=null}}
+function finishRecording(){
+  clearInterval(recordingTimer);recordingTimer=0;$('#stopRecording').hidden=true;$('#recordVoice').hidden=cur!=='letter'&&cur!=='song';$('#recordVoice').textContent=cur==='song'?'🎵 Record song audio':'⏺ Record live';
+  stopTracks();
+}
+async function startRecording(){
+  if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){$('#recordStatus').textContent='Live recording needs a supported browser on HTTPS (or localhost).';return}
+  try{
+    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});recordingParts=[];
+    const formats=['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];
+    const mimeType=formats.find(type=>MediaRecorder.isTypeSupported?.(type));
+    recording=new MediaRecorder(recordingStream,mimeType?{mimeType}:undefined);recordingStarted=Date.now();
+    recording.ondataavailable=event=>{if(event.data?.size){recordingParts.push(event.data);if(recordingParts.reduce((size,part)=>size+part.size,0)>90*1024*1024){$('#recordStatus').textContent='Recording reached the safe size limit; saving it now.';recording.stop()}}};
+    recording.onerror=event=>{$('#recordStatus').textContent=event.error?.message||'Recording failed.';finishRecording()};
+    recording.onstop=()=>{
+      const mime=recording?.mimeType||recordingParts[0]?.type||'audio/webm',blob=new Blob(recordingParts,{type:mime});
+      const ext=mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
+      recording=null;finishRecording();
+      if(blob.size){const file=new File([blob],`voice-note-${Date.now()}.${ext}`,{type:mime});addMedia(file,'audio')}
+      else $('#recordStatus').textContent='No audio was captured. Please try again.';
+    };
+    recording.start(250);$('#recordVoice').hidden=true;$('#stopRecording').hidden=false;
+    $('#recordStatus').textContent='Recording… 00:00';
+    recordingTimer=setInterval(()=>{const seconds=Math.floor((Date.now()-recordingStarted)/1000);$('#recordStatus').textContent=`Recording… ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;if(seconds>=600){$('#recordStatus').textContent='Ten-minute recording limit reached; saving it now.';recording?.stop()}},500);
+  }catch(error){stopTracks();$('#recordStatus').textContent=error.name==='NotAllowedError'?'Allow microphone access to record a voice note.':`Could not start recording: ${error.message||'check your microphone'}`}
+}
+$('#recordVoice').onclick=startRecording;
+$('#stopRecording').onclick=()=>{if(recording?.state==='recording')recording.stop()};
+
 // ---- save / list / edit / delete
 $('#save').onclick=async()=>{
+  if(recording?.state==='recording')return st('Stop the live recording before saving this entry.');
   if(ed.querySelector('[src^="blob:"]'))return st('Media is still uploading. Try again in a moment.');
+  if(cur==='place'&&!placeCoords)return st('Tap a point on the map to pin this place before saving.');
   clearTimeout(draftTimer);stashDraft();
-  const meta={};
-  K[cur][3].forEach(([n])=>{const v=$('#x_'+n).value.trim();meta[n]=n==='rating'?+v:v});
+  const meta=currentMeta();
   const row={kind:cur,day:$('#day').value||T,title:$('#title').value.trim(),body:ed.innerHTML,meta};
+  if(DEMO_MODE){
+    const entries=readDemoEntries(),existing=entries.find(item=>item.id===edit);
+    row.id=edit||newId();row.created_at=existing?.created_at||new Date().toISOString();
+    const updated=edit?entries.map(item=>item.id===edit?row:item):[row,...entries];
+    try{localStorage.setItem(DEMO_ENTRIES,JSON.stringify(updated))}catch{return st('This browser could not save the local demo entry.')}
+    const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();st('Saved in this browser ✨');return;
+  }
   st('Saving…');
   const{error}=edit?await sb.from('entries').update(row).eq('id',edit):await sb.from('entries').insert(row);
   if(error)return st(error.message);
@@ -329,30 +484,42 @@ $('#save').onclick=async()=>{
 $('#new').onclick=()=>{stashDraft();form(cur,null,{fresh:true})};
 
 async function recent(){
+  if(DEMO_MODE){rows=readDemoEntries().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,20);$('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('')||'<li><span>Local demo entries will appear here.</span></li>';return}
   const{data}=await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(20);
   rows=data||[];
   $('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('');
 }
 async function recentReactions(){
-  const{data,error}=await sb.from('letter_reactions').select('reaction,created_at,entries(title,day)').order('created_at',{ascending:false}).limit(20);
-  if(error){$('#reactions').innerHTML='<li><span>Run the updated setup.sql to enable reactions.</span></li>';return}
+  if(DEMO_MODE){$('#reactions').innerHTML='<li><span>Reactions require the connected Supabase site.</span></li>';return}
+  const{data,error}=await sb.from('letter_reactions').select('reaction,created_at,context,latitude,longitude,accuracy,entries(title,day)').order('created_at',{ascending:false}).limit(30);
+  if(error){$('#reactions').innerHTML=`<li><span>Could not load reactions: ${esc(error.message)}. Run the updated setup.sql if the new location fields are missing.</span></li>`;return}
   $('#reactions').innerHTML=data?.length?data.map(item=>{
     const entry=Array.isArray(item.entries)?item.entries[0]:item.entries||{};
-    const label=entry.title||'Letter';
-    return`<li><span>${esc(item.reaction)} ${esc(label)} · ${esc(entry.day||'')}</span><small>${esc(new Date(item.created_at).toLocaleString())}</small></li>`
+    const label=entry.title||'Letter',context=String(item.context||'#letter');
+    const where=Number.isFinite(+item.latitude)&&Number.isFinite(+item.longitude)?`<a href="https://www.openstreetmap.org/?mlat=${encodeURIComponent(item.latitude)}&mlon=${encodeURIComponent(item.longitude)}#map=16/${encodeURIComponent(item.latitude)}/${encodeURIComponent(item.longitude)}" target="_blank" rel="noopener">📍 ${(+item.latitude).toFixed(4)}, ${(+item.longitude).toFixed(4)}</a>`:'Location not shared';
+    return`<li><span>${esc(item.reaction)} ${esc(label)} · ${esc(entry.day||'')}<small class="reaction-context">${esc(context)} · ${where}</small></span><small>${esc(new Date(item.created_at).toLocaleString())}</small></li>`
   }).join(''):'<li><span>No reactions yet.</span></li>';
 }
 $('#recent').onclick=async e=>{
   const i=e.target.dataset.i,d=e.target.dataset.d;
   if(i!=null){form(rows[i].kind,rows[i]);scrollTo(0,0)}
   if(d!=null&&confirm('Delete this entry for good?')){
-    const id=rows[d].id;await sb.from('entries').delete().eq('id',id);
+    const id=rows[d].id;
+    if(DEMO_MODE){localStorage.setItem(DEMO_ENTRIES,JSON.stringify(readDemoEntries().filter(item=>item.id!==id)));recent();return}
+    await sb.from('entries').delete().eq('id',id);
     const drafts=readDrafts();delete drafts[`entry:${id}`];writeDrafts(drafts);renderDrafts();recent();recentReactions();
   }
 };
 
 // ---- login
 async function boot(){
+  if(DEMO_MODE){
+    $('#login').hidden=true;$('#app').hidden=false;$('#demoBanner').hidden=false;$('#out').textContent='Exit demo';document.body.classList.remove('login-screen');
+    const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
+    const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
+    form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});
+    recent();recentReactions();loadEvents();return;
+  }
   const{data:{session}}=await sb.auth.getSession();
   $('#login').hidden=!!session;$('#app').hidden=!session;
   document.body.classList.toggle('login-screen',!session);
@@ -360,7 +527,7 @@ async function boot(){
     const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
     const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
     form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});
-    recent();recentReactions();
+    recent();recentReactions();loadEvents();
   }
 }
 $('#go').onclick=async()=>{
@@ -369,7 +536,7 @@ $('#go').onclick=async()=>{
   if(!error)boot();
 };
 $('#pw').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};
-$('#out').onclick=async()=>{await sb.auth.signOut();boot()};
+$('#out').onclick=async()=>{if(DEMO_MODE){location.href=location.pathname;return}await sb.auth.signOut();boot()};
 boot();
 </script>
 </body>

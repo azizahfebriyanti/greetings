@@ -5,7 +5,7 @@
 window.CFG = {
   url: "https://taoukekwxdnrlunbheww.supabase.co",
   key: "sb_publishable_hgtq6LDKBp7uk8EMLyGcDg_zYWHhShd",
-  name: "you",
+  name: "Kak Satrio",
   // Edit these strings to personalize the opening letter.
   letter: {
     recipient: "MR. S. D. SETYAWAN",
