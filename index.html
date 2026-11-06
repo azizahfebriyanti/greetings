@@ -150,6 +150,9 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 .mail-postmark i{display:block;height:2px;border-radius:4px;background:#8b394080}
 .mail-postmark i:nth-child(2){width:87%}.mail-postmark i:nth-child(3){width:95%}
 .mail-hint{grid-area:hint;min-height:1.5em;margin:0;color:#f1e6d7;font:500 .82rem var(--cap);letter-spacing:.09em;text-align:center;text-shadow:0 2px 10px #000;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease,visibility .35s;}
+.mail-skip{position:fixed;z-index:25;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));min-height:44px;padding:10px 15px;border:1px solid #e7d4b066;border-radius:999px;color:#f3e6d1;background:#11111bcc;box-shadow:0 5px 18px #0007;font:500 .7rem var(--cap);letter-spacing:.09em;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.mail-skip:hover{transform:translateY(-1px);border-color:#edca8c;background:#30222b}
+.mail-skip:focus-visible{outline:3px solid #eccb8b;outline-offset:4px}
 #mailExperience[data-phase="swarm"] .mail-object,#mailExperience[data-phase="swarm"] .mail-hint{opacity:0;visibility:hidden;transform:translateY(16px) scale(.97)}
 #mailExperience[data-phase="back"] .mail-object,#mailExperience[data-phase="back"] .mail-hint,#mailExperience[data-phase="front"] .mail-object,#mailExperience[data-phase="front"] .mail-hint{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
 #mailExperience[data-phase="front"] .mail-object__inner{transform:rotateY(180deg)}
@@ -196,6 +199,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   .pager button{min-height:44px;padding:9px 12px}
   .reaction-trigger{min-height:44px;width:min(100%,290px)}
   #mailExperience{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  .mail-skip{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));min-height:42px;padding:9px 12px;font-size:.65rem}
   .mail-stage{gap:13px}
   .mail-object{width:100%;aspect-ratio:1.47}
   .mail-recipient{max-width:82%;font-size:clamp(1.2rem,6vw,1.7rem)}
@@ -245,6 +249,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
     </article>
     <p class="mail-hint" id="mailHint" role="status" aria-live="polite"></p>
   </div>
+  <button class="mail-skip" id="skipIntro" type="button">SKIP INTRO&nbsp; →</button>
 </section>
 <main id="siteMain">
   <header id="home">
@@ -267,6 +272,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   const letter = document.getElementById('welcomeLetter');
   const hint = document.getElementById('mailHint');
   const continueButton = document.getElementById('enterGreeting');
+  const skipButton = document.getElementById('skipIntro');
   const prefersLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const defaults = {
     recipient: 'MR. S. D. SETYAWAN',
@@ -362,13 +368,17 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
     }
   });
 
-  continueButton.addEventListener('click', () => {
+  function leaveIntro() {
+    if(root.classList.contains('mail-leaving'))return;
+    storm.replaceChildren();
     root.classList.add('mail-leaving');
     window.setTimeout(() => {
       root.classList.remove('mail-intro-enabled', 'mail-leaving');
       document.getElementById('hi').focus({ preventScroll: true });
     }, prefersLessMotion.matches ? 0 : 680);
-  });
+  }
+  continueButton.addEventListener('click',leaveIntro);
+  skipButton.addEventListener('click',leaveIntro);
 
   if (hasOpeningIntro) {
     if (prefersLessMotion.matches) {
