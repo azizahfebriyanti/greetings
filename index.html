@@ -503,14 +503,30 @@ const DEMO=[
   {kind:'place',day:T,title:'Our favourite café',meta:{rating:5},body:'<p>Best hot chocolate, best company.</p>'}
 ];
 
-let placeMap=null,specialEvents=[];
+let placeMap=null,specialEvents=[],songEntriesPromise=null,songPrimer=null,songPrimerSrc='';
 
 async function load(k){
   if(DEMO_MODE){try{const items=JSON.parse(localStorage.getItem(DEMO_ENTRIES)||'[]');const saved=Array.isArray(items)?items.filter(e=>e.kind===k):[];if(saved.length)return saved}catch{}}
   if(!sb)return DEMO.filter(e=>e.kind===k);
-  const{data,error}=await sb.from('entries').select('*').eq('kind',k).order('day',{ascending:false}).order('created_at',{ascending:false});
-  if(error)throw error;
-  return data||[];
+  const query=async()=>{const{data,error}=await sb.from('entries').select('*').eq('kind',k).order('day',{ascending:false}).order('created_at',{ascending:false});if(error)throw error;return data||[]};
+  if(k!=='song')return query();
+  if(!songEntriesPromise)songEntriesPromise=query().catch(error=>{songEntriesPromise=null;throw error});
+  return songEntriesPromise;
+}
+
+async function prepareSongAudio(){
+  try{
+    const songs=(await load('song')).filter(entry=>entry.day<=T),doc=new DOMParser().parseFromString(songs[0]?.body||'','text/html');
+    const audio=doc.querySelector('audio'),source=audio?.getAttribute('src')||audio?.querySelector('source[src]')?.getAttribute('src');if(!source)return;
+    const url=new URL(source,location.href).href;
+    if(songPrimer&&url===songPrimerSrc)return;
+    songPrimer=new Audio(url);songPrimer.preload='auto';songPrimerSrc=url;songPrimer.load();
+  }catch{}
+}
+
+function audioUrl(audio){
+  const source=audio?.getAttribute('src')||audio?.querySelector('source[src]')?.getAttribute('src');
+  return source?new URL(source,location.href).href:'';
 }
 
 const stars=n=>{n=Math.max(0,Math.min(5,+n||0));return'★'.repeat(n)+'☆'.repeat(5-n)};
@@ -552,7 +568,7 @@ function mountAudioPlayer(audio){
   audio.addEventListener('play',()=>{update();setStatus('Now playing · enjoy the tune','playing')});
   audio.addEventListener('pause',()=>{update();if(!audio.ended)setStatus('Paused · tap the seal to resume','paused')});
   audio.addEventListener('ended',()=>{update();setStatus('The tune has ended · play it again','ended')});
-  audio.addEventListener('error',()=>{clock.textContent='Audio unavailable';seek.disabled=true;setStatus('Song could not load · try again later','error')});update();return{audio,play,start};
+  audio.addEventListener('error',()=>{clock.textContent='Audio unavailable';seek.disabled=true;setStatus('Song could not load · try again later','error')});update();if(!audio.paused)setStatus('Now playing · enjoy the tune','playing');return{audio,play,start,setStatus};
 }
 function setupAudioPlayers(){return Array.from($('#view .song .body audio')).map(mountAudioPlayer)}
 
@@ -722,7 +738,11 @@ async function route(){
     v.innerHTML=head+card(k,list[i])+`<div class="pager"><button id="pv" type="button" ${i>=list.length-1?'disabled':''}>‹ older</button><span>${i+1} / ${list.length}</span><button id="nx" type="button" ${i?'':'disabled'}>newer ›</button></div>`;
     $('#pv').onclick=()=>{i++;draw()};
     $('#nx').onclick=()=>{i--;draw()};
-    if(k==='song')setupAudioPlayers().forEach(player=>{player.audio.autoplay=true;player.start(true)});
+    if(k==='song'){
+      const audio=$('#view .song .body audio');
+      if(audio&&songPrimer&&audioUrl(audio)===songPrimerSrc){audio.replaceWith(songPrimer);songPrimer=null}
+      setupAudioPlayers().forEach(player=>{player.audio.autoplay=true;if(player.audio.paused)player.start(true);else player.setStatus('Now playing · enjoy the tune','playing')});
+    }
   };
   draw();
 }
@@ -755,6 +775,7 @@ async function grantPortraitAccess(){
   try{await loadSpecialEvents()}catch{updateSpecialGreeting()}
   accessRoot.classList.remove('access-gate-pending','access-gate-locked');portraitGate.setAttribute('aria-hidden','true');
   settleAccess(true);window.dispatchEvent(new Event('owlpost-access-granted'));
+  prepareSongAudio();
   if(!accessRoot.classList.contains('mail-intro-enabled'))$('#siteMain').focus({preventScroll:true});
 }
 async function initializePortraitAccess(){
@@ -793,6 +814,11 @@ $('#sub').innerHTML=fmt(T)+'<br>'+(C.name?'for '+esc(C.name):'to one of my favor
 if(C.name)document.title='to: '+C.name+' 🦉';
 if(!sb)$('.foot').append(' (sample data: fill in config.js)');
 $('#nav').innerHTML=Object.entries(S).map(([k,s])=>`<a href="#${k}" data-k="${k}"><b>${s.i}</b><span>${s.n}</span><small>${s.s}</small></a>`).join('');
+$('#nav').addEventListener('click',event=>{
+  if(!event.target.closest('a[data-k="song"]'))return;
+  const audio=$('#view .song .audio-player__source')||songPrimer;
+  if(audio?.paused)audio.play().catch(()=>{});
+});
 
 // atmosphere: twinkling stars + floating candles
 for(let i=0;i<60;i++){const s=document.createElement('i');s.className='star';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--l:-${Math.random()*5}s`;$('#sky').append(s)}
