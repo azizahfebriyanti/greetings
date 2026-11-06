@@ -32,8 +32,10 @@ body{margin:0;min-height:100vh;min-height:100svh;padding:max(22px,env(safe-area-
 @keyframes bob{to{transform:translateY(-14px)}}
 @keyframes fl{to{transform:scale(.88,1.1)}}
 main{position:relative;z-index:1;max-width:700px;margin:0 auto;text-align:center}
+#siteMain:focus{outline:none}
 .orn{margin:18px 0 8px;color:var(--gold);letter-spacing:.6em;opacity:.8}
 h1{margin:0;font:700 clamp(2.1rem,9vw,3.6rem)/1.1 var(--disp);background:linear-gradient(#fff3c4,var(--gold2) 45%,#a8761a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 10px #740001aa)}
+#hi:focus{outline:none}
 .sub{margin:14px 0 0;font-size:1.1rem;line-height:1.6;opacity:.88}
 .seal{display:block;margin:28px auto 12px;width:94px;height:94px;border:0;border-radius:50%;cursor:pointer;font-size:2rem;color:#f6d79b;background:radial-gradient(circle at 35% 30%,#c32a32,var(--red) 62%,#360004);box-shadow:0 8px 20px #000a,inset 0 0 0 5px #8a1118,inset 0 0 0 7px #e0545a44,0 0 34px #740001cc;transition:transform .25s;-webkit-tap-highlight-color:transparent}
 .seal:hover{transform:scale(1.07) rotate(-5deg)}
@@ -143,22 +145,8 @@ html.access-gate-pending #mailExperience,html.access-gate-locked #mailExperience
 html.access-gate-pending .portrait-gate,html.access-gate-locked .portrait-gate{display:grid}
 .portrait-gate::before{position:fixed;inset:0;content:"";pointer-events:none;opacity:.2;background:repeating-linear-gradient(0deg,#fff0 0 3px,#fff1 4px,#fff0 5px);mix-blend-mode:screen}
 .portrait-layout{position:relative;display:grid;grid-template-columns:minmax(190px,.85fr) minmax(290px,1.15fr);align-items:center;gap:clamp(30px,7vw,76px);width:min(820px,100%);margin:auto;padding:clamp(22px,5vw,50px);border:1px solid #d3a62555;background:linear-gradient(130deg,#161521ed,#0e0d17ed 62%,#180d18ed);box-shadow:0 30px 90px #000b,0 0 55px #74000120,inset 0 0 32px #d3a62508}
-.portrait-art{display:grid;justify-items:center;gap:13px}
-.portrait-frame{position:relative;width:min(100%,280px);aspect-ratio:.76;padding:11px;border:8px ridge #a98742;border-radius:48% 48% 4px 4px/29% 29% 4px 4px;background:linear-gradient(135deg,#56381f,#d5b56e 16%,#4b2e20 31%,#cfad62 49%,#3d281e 70%,#c29b4e);box-shadow:0 0 0 2px #271a17,0 15px 45px #0009,0 0 35px #d3a62529}
-.portrait-canvas{position:relative;width:100%;height:100%;overflow:hidden;border:2px solid #593c26;border-radius:inherit;background:radial-gradient(ellipse at 50% 29%,#796b73 0,#373044 35%,transparent 64%),linear-gradient(180deg,#171829,#241622 65%,#381319);box-shadow:inset 0 0 32px #000b}
-.portrait-canvas::before{position:absolute;inset:0;content:"";opacity:.22;background:repeating-linear-gradient(0deg,transparent 0 4px,#e0c98b21 5px,transparent 6px),radial-gradient(ellipse at 50% 52%,transparent 33%,#080710 100%)}
-.portrait-moon{position:absolute;top:9%;right:13%;width:23%;aspect-ratio:1;border-radius:50%;background:#e9d8ac;box-shadow:0 0 30px 9px #d7c69b55;opacity:.72}
-.portrait-bust{position:absolute;left:50%;bottom:-4%;width:72%;height:73%;transform:translateX(-50%)}
-.portrait-shoulders{position:absolute;bottom:0;left:0;width:100%;height:48%;border:2px solid #b99a60;border-radius:49% 49% 4% 4%/45% 45% 4% 4%;background:linear-gradient(110deg,#39202a,#786047 35%,#2d273b 68%,#26151f);box-shadow:inset 0 8px 19px #e4c58124}
-.portrait-collar{position:absolute;z-index:3;bottom:26%;left:50%;width:41%;height:30%;transform:translateX(-50%);clip-path:polygon(50% 0,100% 100%,50% 75%,0 100%);background:linear-gradient(90deg,#d4bc82,#f1e4bd,#b19458)}
-.portrait-hair{position:absolute;z-index:2;top:4%;left:10%;width:80%;height:54%;border:2px solid #bb9860;border-radius:48% 48% 35% 35%;background:linear-gradient(100deg,#221d25,#c5ae85 24%,#514344 44%,#d2bb8c 66%,#28202a);box-shadow:0 0 12px #0009}
-.portrait-hair::before,.portrait-hair::after{position:absolute;top:42%;width:24%;height:63%;content:"";background:linear-gradient(90deg,#30232b,#b69c73 55%,#423039);border:1px solid #b99a60}
-.portrait-hair::before{left:-4%;transform:rotate(7deg);border-radius:5px 5px 45% 30%}
-.portrait-hair::after{right:-4%;transform:rotate(-7deg);border-radius:5px 5px 30% 45%}
-.portrait-face{position:absolute;z-index:3;top:15%;left:23%;width:54%;height:43%;border:1px solid #dfc293;border-radius:47% 47% 46% 46%;background:linear-gradient(100deg,#8a655d,#e4c59a 42%,#a67d6f);box-shadow:inset 0 -8px 12px #533a3a45}
-.portrait-face::before{position:absolute;top:43%;left:23%;width:54%;height:4px;content:"";background:radial-gradient(ellipse at 16% 50%,#281f27 0 2px,transparent 3px),radial-gradient(ellipse at 84% 50%,#281f27 0 2px,transparent 3px);border-top:1px solid #65454a}
-.portrait-face::after{position:absolute;bottom:19%;left:39%;width:23%;height:6px;content:"";border-bottom:1px solid #674348;border-radius:50%}
-.portrait-brooch{position:absolute;z-index:4;bottom:22%;left:50%;display:grid;place-items:center;width:27px;aspect-ratio:1;transform:translateX(-50%);border:1px solid #e8cf8e;border-radius:50%;color:#f0dda9;background:#6d1324;box-shadow:0 0 12px #d3a62555;font:14px Georgia,serif}
+.portrait-art{display:grid;justify-items:center;gap:10px;width:min(100%,260px)}
+.portrait-image{display:block;width:auto;max-width:100%;height:min(72svh,720px);object-fit:contain;filter:drop-shadow(0 18px 28px #000a) drop-shadow(0 0 22px #d3a62522)}
 .portrait-plaque{color:#d6bd83;font:500 .58rem var(--cap);letter-spacing:.2em;text-align:center;text-shadow:0 2px 5px #000}
 .portrait-copy{min-width:0;text-align:left}
 .portrait-eyebrow{margin:0 0 11px;color:#d9b768;font:500 .68rem var(--cap);letter-spacing:.23em;text-transform:uppercase}
@@ -177,8 +165,8 @@ html.access-gate-pending .portrait-gate,html.access-gate-locked .portrait-gate{d
 .portrait-form :focus-visible{outline-color:#f2cf75}
 html.access-gate-pending .portrait-gate .portrait-layout,html.access-gate-locked .portrait-gate .portrait-layout{animation:portrait-arrive .65s cubic-bezier(.2,.75,.25,1) both}
 @keyframes portrait-arrive{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
-@media(max-width:680px){.portrait-layout{grid-template-columns:minmax(0,1fr);gap:25px;width:min(490px,100%);padding:24px 22px}.portrait-frame{width:min(198px,56vw)}.portrait-description{margin:12px 0 18px}}
-@media(max-width:360px){.portrait-layout{padding:21px 17px;gap:19px}.portrait-frame{width:min(160px,48vw)}.portrait-plaque{font-size:.52rem}}
+@media(max-width:680px){.portrait-layout{grid-template-columns:minmax(0,1fr);gap:20px;width:min(490px,100%);padding:24px 22px}.portrait-copy{grid-row:1}.portrait-art{grid-row:2;width:100%}.portrait-image{height:min(52svh,470px)}.portrait-description{margin:12px 0 18px}}
+@media(max-width:360px){.portrait-layout{padding:21px 17px;gap:16px}.portrait-image{height:min(46svh,400px)}.portrait-plaque{font-size:.52rem}}
 @media(prefers-reduced-motion:reduce){.portrait-layout{animation:none!important}.portrait-enter{transition:none}}
 
 /* Personal letter intro */
@@ -281,12 +269,9 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 <div id="sky" aria-hidden="true"></div><div id="candles" aria-hidden="true"></div>
 <section class="portrait-gate" id="portraitGate" role="dialog" aria-modal="true" aria-labelledby="portraitTitle">
   <div class="portrait-layout">
-    <div class="portrait-art" aria-hidden="true">
-      <div class="portrait-frame"><div class="portrait-canvas">
-        <span class="portrait-moon"></span>
-        <div class="portrait-bust"><span class="portrait-shoulders"></span><span class="portrait-collar"></span><span class="portrait-hair"><span class="portrait-face"></span></span><span class="portrait-brooch">✦</span></div>
-      </div></div>
-      <p class="portrait-plaque">THE NORTH TOWER · PORTRAIT GALLERY</p>
+    <div class="portrait-art">
+      <img class="portrait-image" src="assets/fat-lady.jpg" alt="The Fat Lady's portrait, with its ornate arch and password plaque">
+      <p class="portrait-plaque" aria-hidden="true">THE NORTH TOWER · PORTRAIT GALLERY</p>
     </div>
     <div class="portrait-copy">
       <p class="portrait-eyebrow">A private owl post</p>
@@ -298,7 +283,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
         <button class="portrait-enter" id="portraitEnter" type="submit">SPEAK THE PASSWORD&nbsp; ✦</button>
       </form>
       <p class="portrait-status" id="portraitStatus" role="status" aria-live="polite">A password is needed to pass the portrait.</p>
-      <p class="portrait-note">This portrait opens only for its invited guest.</p>
+      <p class="portrait-note">The portrait remembers you on this browser for one hour.</p>
     </div>
   </div>
 </section>
@@ -350,7 +335,7 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   <nav id="nav"></nav>
   <section id="view" aria-live="polite"></section>
 </main>
-<script src="config.js"></script>
+<script src="config.js?v=portrait-gate-1"></script>
 <script>
 (async () => {
   await new Promise(resolve => window.addEventListener('owlpost-access-granted', resolve, { once: true }));
@@ -486,10 +471,14 @@ const $=s=>document.querySelector(s),C=window.CFG||{},T=(()=>{const d=new Date()
 const LOCAL_HOST=location.protocol==='file:'||['localhost','127.0.0.1','::1'].includes(location.hostname);
 const DEMO_MODE=LOCAL_HOST&&new URLSearchParams(location.search).get('demo')==='1';
 const DEMO_ENTRIES='owlpost:local-admin-demo-entries:v1',DEMO_SETTINGS='owlpost:local-admin-demo-settings:v1';
-const sb=!DEMO_MODE&&C.url&&window.supabase?supabase.createClient(C.url,C.key,{auth:{storageKey:'owlpost-satrio-visitor-auth-v1',persistSession:false}}):null;
+const sb=!DEMO_MODE&&C.url&&window.supabase?supabase.createClient(C.url,C.key,{auth:{storageKey:'owlpost-satrio-visitor-auth-v1',persistSession:true}}):null;
+const VISITOR_AUTH_TIME='owlpost:satrio-authenticated-at:v1',VISITOR_AUTH_WINDOW=60*60*1000;
 let visitorAccess=false,accessReadyResolve,accessReadyDone=false;
 const accessReady=new Promise(resolve=>{accessReadyResolve=resolve});
 function settleAccess(allowed){visitorAccess=allowed;if(!accessReadyDone){accessReadyDone=true;accessReadyResolve(allowed)}}
+function visitorAuthTime(){try{return Number(localStorage.getItem(VISITOR_AUTH_TIME))||0}catch{return 0}}
+function rememberVisitorAuth(){try{localStorage.setItem(VISITOR_AUTH_TIME,String(Date.now()))}catch{}}
+function clearVisitorAuth(){try{localStorage.removeItem(VISITOR_AUTH_TIME)}catch{}}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=h=>window.DOMPurify?DOMPurify.sanitize(h||'',{ADD_TAGS:['audio','video','source'],ADD_ATTR:['controls','preload','playsinline','poster']}):'';
 const fmt=d=>new Date(d+'T00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -520,7 +509,8 @@ async function load(k){
   if(DEMO_MODE){try{const items=JSON.parse(localStorage.getItem(DEMO_ENTRIES)||'[]');const saved=Array.isArray(items)?items.filter(e=>e.kind===k):[];if(saved.length)return saved}catch{}}
   if(!sb)return DEMO.filter(e=>e.kind===k);
   const{data,error}=await sb.from('entries').select('*').eq('kind',k).order('day',{ascending:false}).order('created_at',{ascending:false});
-  return error?[]:data;
+  if(error)throw error;
+  return data||[];
 }
 
 const stars=n=>{n=Math.max(0,Math.min(5,+n||0));return'★'.repeat(n)+'☆'.repeat(5-n)};
@@ -712,7 +702,11 @@ async function route(){
   v.innerHTML=k==='letter'||k==='song'
     ?'<div class="mail-loading" role="status"><span class="mail-loading__track" aria-hidden="true"><span class="mail-loading__letter">✉</span><span class="mail-loading__letter">✉</span><span class="mail-loading__letter">✉</span></span><span>🦉 the owl is fetching it…</span></div>'
     :'<p class="hint">🦉 the owl is fetching it…</p>';
-  let list=await load(k);
+  let list;
+  try{list=await load(k)}catch(error){
+    v.innerHTML=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3><p class="hint" role="alert">The Supabase archive could not be opened: ${esc(error.message||'check the account access policy')}.</p>`;
+    return;
+  }
   if(s.d)list=list.filter(e=>e.day<=T);   // future-dated entries stay hidden until their day
   if(k==='reason')list.reverse();           // oldest first, so reason numbers never change
   if(k==='place'){showPlaces(list);return}
@@ -751,11 +745,11 @@ $('#seal').onclick=e=>{
 };
 
 const accessRoot=document.documentElement,portraitGate=$('#portraitGate'),portraitForm=$('#portraitForm'),portraitPassword=$('#portraitPassword'),portraitEnter=$('#portraitEnter'),portraitStatus=$('#portraitStatus');
-function showPortraitGate(message,disableForm=false){
+function showPortraitGate(message){
   accessRoot.classList.remove('access-gate-pending');accessRoot.classList.add('access-gate-locked');
   portraitGate.setAttribute('aria-hidden','false');portraitStatus.textContent=message;
-  portraitPassword.disabled=disableForm;portraitEnter.disabled=disableForm;
-  settleAccess(false);window.setTimeout(()=>{if(!disableForm)portraitPassword.focus({preventScroll:true})},0);
+  portraitPassword.disabled=false;portraitEnter.disabled=false;
+  settleAccess(false);window.setTimeout(()=>portraitPassword.focus({preventScroll:true}),0);
 }
 async function grantPortraitAccess(){
   try{await loadSpecialEvents()}catch{updateSpecialGreeting()}
@@ -765,27 +759,31 @@ async function grantPortraitAccess(){
 }
 async function initializePortraitAccess(){
   if(DEMO_MODE||!C.url){await grantPortraitAccess();return}
-  if(!sb){showPortraitGate('The portrait cannot reach the castle right now. Check the Supabase setup and reload.',true);return}
-  if(!String(C.visitorEmail||'').trim()){showPortraitGate('Set CFG.visitorEmail in config.js to the invited Supabase account before opening this portrait.',true);return}
+  if(!sb){showPortraitGate('The portrait cannot reach the castle right now. Check the Supabase setup and reload.');return}
+  if(!String(C.visitorEmail||'').trim()){showPortraitGate('Set CFG.visitorEmail in config.js to the invited Supabase account before opening this portrait.');return}
   try{
     const{data,error}=await sb.auth.getSession();if(error)throw error;
     const email=String(C.visitorEmail).trim().toLowerCase();
-    if(data.session&&String(data.session.user?.email||'').toLowerCase()===email){await grantPortraitAccess();return}
+    const startedAt=visitorAuthTime(),age=Date.now()-startedAt;
+    const remembered=startedAt>0&&age>=0&&age<VISITOR_AUTH_WINDOW;
+    if(data.session&&String(data.session.user?.email||'').toLowerCase()===email&&remembered){await grantPortraitAccess();return}
     if(data.session)await sb.auth.signOut();
+    clearVisitorAuth();
     showPortraitGate('The portrait is listening. Enter the password for the invited account.');
   }catch(error){showPortraitGate('The portrait cannot be reached just now. Check your connection, then try again.');}
 }
 portraitForm.addEventListener('submit',async event=>{
   event.preventDefault();
-  if(!sb||!String(C.visitorEmail||'').trim()){portraitStatus.textContent='The Supabase visitor account is not configured yet.';return}
+  if(!String(C.visitorEmail||'').trim()){portraitStatus.textContent='Set CFG.visitorEmail in config.js to the invited Supabase account first.';portraitPassword.focus();return}
+  if(!sb){portraitStatus.textContent='The portrait cannot reach Supabase right now. Check your connection and try again.';return}
   const password=portraitPassword.value;if(!password){portraitStatus.textContent='Whisper the password first.';portraitPassword.focus();return}
   portraitPassword.disabled=true;portraitEnter.disabled=true;portraitStatus.textContent='The portrait is considering your answer…';
   try{
     const{data,error}=await sb.auth.signInWithPassword({email:String(C.visitorEmail).trim(),password});
     if(error)throw error;
     const email=String(C.visitorEmail).trim().toLowerCase();
-    if(String(data.user?.email||'').toLowerCase()!==email){await sb.auth.signOut();throw new Error('This is not the invited account.')}
-    portraitPassword.value='';await grantPortraitAccess();route();
+    if(String(data.user?.email||'').toLowerCase()!==email){await sb.auth.signOut();clearVisitorAuth();throw new Error('This is not the invited account.')}
+    rememberVisitorAuth();portraitPassword.value='';await grantPortraitAccess();route();
   }catch(error){portraitPassword.value='';portraitPassword.disabled=false;portraitEnter.disabled=false;portraitStatus.textContent='That password did not open the portrait. Try again.';portraitPassword.focus()}
 });
 

@@ -22,7 +22,7 @@ alter table entries enable row level security;
 drop policy if exists "anyone can read" on entries;
 drop policy if exists "only invited accounts can read entries" on entries;
 create policy "only invited accounts can read entries" on entries for select to authenticated using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satriods547@gmail.com')
 );
 
 drop policy if exists "only the owner writes" on entries;
@@ -64,7 +64,7 @@ create policy "anyone can add letter reactions" on letter_reactions
     and (latitude is null or latitude between -90 and 90)
     and (longitude is null or longitude between -180 and 180)
     and (accuracy is null or accuracy >= 0)
-    and lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
+    and lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satriods547@gmail.com')
   );
 drop policy if exists "only the owner can read letter reactions" on letter_reactions;
 create policy "only the owner can read letter reactions" on letter_reactions
@@ -90,7 +90,7 @@ drop policy if exists "anyone can read site settings" on public.site_settings;
 drop policy if exists "only invited accounts can read site settings" on public.site_settings;
 create policy "only invited accounts can read site settings" on public.site_settings
   for select to authenticated using (
-    lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satrio@example.com')
+    lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satriods547@gmail.com')
   );
 drop policy if exists "only the owner inserts site settings" on public.site_settings;
 create policy "only the owner inserts site settings" on public.site_settings
