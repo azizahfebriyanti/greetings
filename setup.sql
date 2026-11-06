@@ -64,9 +64,13 @@ create policy "anyone can add letter reactions" on letter_reactions
 drop policy if exists "only the owner can read letter reactions" on letter_reactions;
 create policy "only the owner can read letter reactions" on letter_reactions
   for select to authenticated using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
+drop policy if exists "only the owner can delete letter reactions" on letter_reactions;
+create policy "only the owner can delete letter reactions" on letter_reactions
+  for delete to authenticated using ((auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
 revoke all on table public.letter_reactions from anon, authenticated;
 grant select on public.letter_reactions to authenticated;
 grant insert on public.letter_reactions to anon, authenticated;
+grant delete on public.letter_reactions to authenticated;
 
 -- Public, editable-by-owner content for countdowns and special-day greetings.
 create table if not exists public.site_settings (

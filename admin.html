@@ -47,6 +47,19 @@ button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;to
 #placeCoordinates{display:block;min-height:1.3em;margin-top:8px;color:#eeba30;font: .82rem system-ui,sans-serif}
 .leaflet-container{font-family:"IM Fell English",Georgia,serif}
 .leaflet-control-attribution{font:11px/1.3 system-ui,sans-serif}
+.map-search{display:grid;gap:7px;margin:5px 0 12px}
+.map-search label{color:var(--gold);font:500 .8rem Cinzel,serif}
+.map-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.map-search-row button{min-width:100px}
+#placeSearchStatus{min-height:1.25em;margin:0;color:#eeba30;font:.8rem system-ui,sans-serif}
+#placeSearchResults{display:grid;gap:5px;margin:0;padding:0;list-style:none}
+#placeSearchResults button{width:100%;padding:9px 11px;text-align:left;font: .86rem/1.4 system-ui,sans-serif;background:#191727;border-color:#d3a62544}
+#placeSearchResults button:hover{background:#30203a;border-color:#eeba30}
+.map-search-note{margin:0;color:#d7c9aa;font:.74rem/1.45 system-ui,sans-serif;opacity:.8}
+.admin-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px 0 8px}
+.admin-menu button{min-height:46px;border-color:#d3a62566;background:#11101e}
+.admin-menu button.on{border-color:#eeba30;background:linear-gradient(115deg,#740001,#302046);box-shadow:0 0 18px #74000144}
+#settingsPanel>.special-settings{margin-top:4px}
 .special-settings{padding:16px;border:1px solid #d3a62555;background:linear-gradient(145deg,#161527dd,#0e0d19ee);box-shadow:0 12px 35px #0005}
 #demoBanner{padding:11px 14px;border:1px solid #eeba3088;color:#f4d994;background:#5b3c1555;font:.85rem/1.5 system-ui,sans-serif}
 .special-settings h2{margin:0 0 5px;color:var(--gold);font:700 1.05rem Cinzel,serif}
@@ -62,6 +75,9 @@ button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;to
 #recordStatus{min-height:1.3em;grid-column:1/-1;color:#eeba30;font:.84rem system-ui,sans-serif}
 #reactions .reaction-context{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;color:#cbb98f;font:.76rem system-ui,sans-serif}
 #reactions .reaction-context a{color:#eeba30}
+#reactions li{align-items:flex-start}
+#reactions .retract-reaction{width:auto;min-width:82px;padding:7px 9px;border-color:#943b4a;color:#ffd9d9;background:#3a101b;font-size:.72rem}
+#reactions .retract-reaction:hover{background:#641728}
 #ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
 #ed:focus{outline-color:var(--gold)}
 #ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
@@ -73,6 +89,11 @@ button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;to
 .draft-open{display:grid;gap:2px;flex:1;width:auto;padding:6px 8px;border:0;background:none;text-align:left;font:inherit;font-size:.95rem}
 .draft-open small{color:var(--gold);font-size:.76rem;font-weight:400}
 .draft-remove{width:auto;min-width:36px;padding:4px 9px;background:none}
+.categorized-group{margin:12px 0;border:1px solid #d3a62544;background:#0d0c1888}
+.categorized-group>summary{padding:11px 13px;color:#f1d58f;background:#181527;font:700 .83rem Cinzel,serif;cursor:pointer}
+.categorized-group>summary small{margin-left:6px;color:#c5ae76;font:400 .78rem system-ui,sans-serif}
+.categorized-group>ul{padding:0 8px}
+.category-empty{padding:10px 12px;color:#d7c9aa;font:.85rem system-ui,sans-serif;opacity:.7}
 ul{margin:0;padding:0;list-style:none}
 li{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #d3a62533}
 li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
@@ -89,6 +110,7 @@ li button{padding:4px 9px;background:none}
   #ed{min-height:42vh;min-height:42svh;padding:14px;font-size:1.05rem;overflow-wrap:anywhere}
   #ed img,#ed audio,#ed video{max-width:100%}
   #placePickerMap{height:48svh;min-height:290px}
+  .map-search-row button{min-width:82px}
   .event-row{grid-template-columns:minmax(0,1fr) auto}
   .event-row input:not(.event-greeting){grid-column:1/-1}
   .event-row .event-greeting{grid-column:1/-1}
@@ -119,19 +141,25 @@ li button{padding:4px 9px;background:none}
 <main id="app" hidden>
   <h1>✒️ Staff Room</h1>
   <p id="demoBanner" hidden>Local demo mode — entries and special days save in this browser and appear on <code>index.html?demo=1</code>. Supabase reactions and media uploads are disabled.</p>
-  <section class="special-settings" aria-labelledby="specialTitle">
-    <h2 id="specialTitle">✨ Special days &amp; Hogwarts Express</h2>
-    <p>Add birthdays, anniversaries, Eid, or your next meeting. Today’s greeting replaces “Happy Friday!”; the nearest event appears as a countdown.</p>
-    <div id="eventRows"></div>
-    <div class="row settings-controls"><button type="button" id="addEvent">＋ Add a special day</button><button type="button" id="saveEvents">Save special days</button><span id="settingsStatus" role="status" aria-live="polite"></span></div>
-  </section>
+  <nav class="admin-menu" id="adminMenu" aria-label="Admin menu">
+    <button type="button" class="on" data-panel="entriesPanel">📝 Entries</button>
+    <button type="button" data-panel="settingsPanel">⚙️ Settings</button>
+  </nav>
+  <section id="entriesPanel">
   <div class="tabs" id="tabs"></div>
   <input type="date" id="day" aria-label="date shown on the page">
   <input id="title">
   <div id="extra"></div>
   <fieldset id="placePicker" hidden>
     <legend>📍 Pin this visit on the map</legend>
-    <p>Tap or click the map to choose the place. That pin will appear on the Marauder’s Map in visit order.</p>
+    <p>Search an address or place, choose a result, or tap the map to fine-tune the pin. It will appear on the Marauder’s Map in visit order.</p>
+    <div class="map-search">
+      <label for="placeSearch">Search OpenStreetMap</label>
+      <div class="map-search-row"><input id="placeSearch" type="search" placeholder="e.g. Kota Tua Jakarta" autocomplete="off"><button id="searchPlace" type="button">Search</button></div>
+      <p id="placeSearchStatus" role="status" aria-live="polite"></p>
+      <ul id="placeSearchResults" aria-label="Place search results"></ul>
+      <p class="map-search-note">Search runs only when you tap Search. Results from © OpenStreetMap contributors via Nominatim.</p>
+    </div>
     <div id="placePickerMap" role="application" aria-label="Choose the place location on OpenStreetMap"></div>
     <span id="placeCoordinates">No map pin selected.</span>
   </fieldset>
@@ -149,7 +177,7 @@ li button{padding:4px 9px;background:none}
     <button type="button" id="video" hidden>🎥 Video</button>
     <input type="file" id="videoFile" accept="video/*" hidden>
   </div>
-  <p class="editor-note">Tip: use Photo or paste a copied image with Ctrl+V. Letter and song entries accept .m4a audio, uploaded recordings, or a new live voice recording.</p>
+  <p class="editor-note" id="editorNote">Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.</p>
   <p id="recordStatus" role="status" aria-live="polite"></p>
   <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
   <p id="draftState" class="draft-state" role="status" aria-live="polite"></p>
@@ -159,12 +187,21 @@ li button{padding:4px 9px;background:none}
     <span id="st" role="status"></span>
     <button type="button" id="out" style="margin-left:auto">Log out</button>
   </div>
-  <h1 style="font-size:1.1rem">Recent entries</h1>
-  <ul id="recent"></ul>
+  <h1 style="font-size:1.1rem">Saved entries by category</h1>
+  <div id="recent"></div>
   <h2 class="section-title">Drafts saved on this device</h2>
-  <ul id="drafts"></ul>
+  <div id="drafts"></div>
   <h2 class="section-title">Reactions from the owl post</h2>
   <ul id="reactions"></ul>
+  </section>
+  <section id="settingsPanel" hidden>
+    <section class="special-settings" aria-labelledby="specialTitle">
+      <h2 id="specialTitle">✨ Special days &amp; Hogwarts Express</h2>
+      <p>Add birthdays, anniversaries, Eid, or your next meeting. Today’s greeting replaces the daily greeting; the nearest event appears as a countdown.</p>
+      <div id="eventRows"></div>
+      <div class="row settings-controls"><button type="button" id="addEvent">＋ Add a special day</button><button type="button" id="saveEvents">Save special days</button><span id="settingsStatus" role="status" aria-live="polite"></span></div>
+    </section>
+  </section>
 </main>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -183,23 +220,24 @@ function readDemoEntries(){try{const items=JSON.parse(localStorage.getItem(DEMO_
 // kind: [icon, label, title placeholder (null = no title), extra fields]
 const K={
   letter:['✉️','Letter','Title (optional), e.g. Dear you,',[]],
-  song:['🎶','Song','Song title',[['artist','Artist'],['link','Spotify / YouTube or direct audio URL']]],
+  song:['🎶','Song','Song title',[['artist','Artist']]],
   hadith:['📜','Hadith','Label (optional)',[['source','Source, e.g. Sahih Bukhari 1']]],
   reason:['🪞','Reason',null,[]],
   place:['🗺️','Place','Place name',[['rating']]]
 };
 const ed=$('#ed'),DRAFT_STORE='owlpost:staff-drafts:v1',LAST_DRAFT_STORE='owlpost:staff-last-draft:v1';
-let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0,placePickerMap=null,placeMarker=null,placeCoords=null,eventDrafts=[],recording=null,recordingStream=null,recordingParts=[],recordingTimer=0,recordingStarted=0;
+let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0,placePickerMap=null,placeMarker=null,placeCoords=null,placeSearchCache=new Map(),placeSearchAt=0,placeSearchBusy=false,placeSearchResults=[],eventDrafts=[],recording=null,recordingStream=null,recordingParts=[],recordingTimer=0,recordingStarted=0;
 const newId=()=>crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;
 function readDrafts(){try{const value=JSON.parse(localStorage.getItem(DRAFT_STORE)||'{}');return value&&typeof value==='object'?value:{}}catch{return{}}}
 function writeDrafts(value){try{localStorage.setItem(DRAFT_STORE,JSON.stringify(value));return true}catch{$('#draftState').textContent='Could not save this draft on the device.';return false}}
 function renderDrafts(){
   const drafts=Object.entries(readDrafts()).sort((a,b)=>(b[1].updatedAt||0)-(a[1].updatedAt||0));
-  $('#drafts').innerHTML=drafts.length?drafts.map(([key,d])=>{
+  const groups=Object.entries(K).map(([kind,category])=>[kind,category,drafts.filter(([,draft])=>draft.kind===kind)]).filter(([, ,items])=>items.length);
+  $('#drafts').innerHTML=groups.length?groups.map(([kind,category,items])=>`<details class="categorized-group"><summary>${category[0]} ${esc(category[1])}<small>${items.length}</small></summary><ul>${items.map(([key,d])=>{
     const label=d.title||txt(d.body).trim().replace(/\s+/g,' ').slice(0,58)||'Untitled draft';
     const stamp=d.updatedAt?new Date(d.updatedAt).toLocaleString():'';
-    return`<li><button class="draft-open" type="button" data-draft="${esc(key)}"><span>${esc(label)}</span><small>${esc(K[d.kind]?.[1]||d.kind)} · ${esc(stamp)}</small></button><button class="draft-remove" type="button" data-remove-draft="${esc(key)}" aria-label="Delete saved draft">✕</button></li>`
-  }).join(''):'<li><span>No saved drafts yet.</span></li>';
+    return`<li><button class="draft-open" type="button" data-draft="${esc(key)}"><span>${esc(label)}</span><small>${esc(stamp)}</small></button><button class="draft-remove" type="button" data-remove-draft="${esc(key)}" aria-label="Delete saved draft">✕</button></li>`
+  }).join('')}</ul></details>`).join(''):'<p class="category-empty">No saved drafts yet.</p>';
 }
 function chooseDraftKey(k,row){
   if(row?.id)return`entry:${row.id}`;
@@ -229,6 +267,42 @@ function initPlacePicker(){
   }
   requestAnimationFrame(()=>{placePickerMap.invalidateSize();updatePlaceMarker(placeCoords?.lat,placeCoords?.lng)});
 }
+
+function renderPlaceSearchResults(results){
+  placeSearchResults=results;const list=$('#placeSearchResults');list.replaceChildren();
+  results.forEach((result,index)=>{
+    const item=document.createElement('li'),button=document.createElement('button');
+    button.type='button';button.dataset.searchResult=String(index);button.textContent=result.display_name||'Unnamed place';
+    item.append(button);list.append(item);
+  });
+}
+async function searchPlace(){
+  const query=$('#placeSearch').value.trim(),button=$('#searchPlace'),status=$('#placeSearchStatus');
+  if(query.length<3){status.textContent='Enter at least 3 characters to search.';return}
+  const key=query.toLocaleLowerCase();
+  if(placeSearchCache.has(key)){renderPlaceSearchResults(placeSearchCache.get(key));status.textContent=placeSearchCache.get(key).length?'Choose a result to pin it.':'No places found. Try a more specific name or address.';return}
+  if(placeSearchBusy)return;
+  placeSearchBusy=true;button.disabled=true;status.textContent='Searching the map…';renderPlaceSearchResults([]);
+  try{
+    const wait=Math.max(0,1100-(Date.now()-placeSearchAt));if(wait)await new Promise(resolve=>setTimeout(resolve,wait));
+    const params=new URLSearchParams({q:query,format:'jsonv2',limit:'6',addressdetails:'1'});
+    placeSearchAt=Date.now();
+    const response=await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`,{headers:{Accept:'application/json'}});
+    if(!response.ok)throw new Error(`Search service returned ${response.status}.`);
+    const data=await response.json(),results=Array.isArray(data)?data.filter(item=>Number.isFinite(+item.lat)&&Number.isFinite(+item.lon)):[];
+    placeSearchCache.set(key,results);renderPlaceSearchResults(results);
+    status.textContent=results.length?'Choose a result to pin it.':'No places found. Try a more specific name or address.';
+  }catch(error){status.textContent=`Could not search places: ${error.message||'check your connection'}`}
+  finally{placeSearchBusy=false;button.disabled=false}
+}
+$('#searchPlace').onclick=searchPlace;
+$('#placeSearch').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchPlace()}});
+$('#placeSearchResults').onclick=event=>{
+  const button=event.target.closest('[data-search-result]');if(!button||!placePickerMap)return;
+  const result=placeSearchResults[+button.dataset.searchResult];if(!result)return;
+  updatePlaceMarker(+result.lat,+result.lon);placePickerMap.setView([+result.lat,+result.lon],16);
+  $('#placeSearchStatus').textContent=`Pinned: ${result.display_name||'Selected location'}`;scheduleDraft();
+};
 
 function renderEventRows(){
   $('#eventRows').innerHTML=eventDrafts.length?eventDrafts.map((item,index)=>`<div class="event-row" data-event-row="${index}" data-id="${esc(item.id||'')}">
@@ -292,6 +366,13 @@ document.execCommand('defaultParagraphSeparator',false,'p');
 
 $('#tabs').innerHTML=Object.entries(K).map(([k,v])=>`<button type="button" data-k="${k}">${v[0]} ${v[1]}</button>`).join('');
 $('#tabs').onclick=e=>{const k=e.target.closest('button')?.dataset.k;if(k)form(k)};
+$('#adminMenu').onclick=e=>{
+  const button=e.target.closest('[data-panel]');if(!button)return;
+  const panel=button.dataset.panel;
+  $('#entriesPanel').hidden=panel!=='entriesPanel';$('#settingsPanel').hidden=panel!=='settingsPanel';
+  $('#adminMenu').querySelectorAll('[data-panel]').forEach(item=>item.classList.toggle('on',item===button));
+  if(panel==='settingsPanel')loadEvents();
+};
 
 function form(k,row,options={}){
   if(formReady)stashDraft();else{clearTimeout(draftTimer);draftTimer=0}
@@ -310,10 +391,12 @@ function form(k,row,options={}){
   ed.innerHTML=source.body||'';
   placeCoords=k==='place'&&Number.isFinite(+m.lat)&&Number.isFinite(+m.lng)?{lat:+m.lat,lng:+m.lng}:null;
   $('#placePicker').hidden=k!=='place';
-  $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#video').hidden=DEMO_MODE||k!=='letter';$('#pic').hidden=DEMO_MODE;
-  $('#voice').textContent=k==='song'?'🎵 Add song audio':'🎙 Add voice note';
+  $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||k!=='letter';$('#video').hidden=DEMO_MODE||k!=='letter';$('#pic').hidden=DEMO_MODE;
+  $('#voice').textContent=k==='song'?'🎵 Upload song MP3':'🎙 Add voice note';
+  $('#voiceFile').accept=k==='song'?'.mp3,audio/mpeg':'audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm';
+  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
   $('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
-  $('#recordVoice').textContent=k==='song'?'🎵 Record song audio':'⏺ Record live';
+  $('#recordVoice').textContent='⏺ Record live';
   formReady=true;
   $('#draftState').textContent=draft?'Restored draft from this device.':'Changes autosave on this device.';
   st(draft?'Draft restored. Save when it is ready.':row?'Editing. Save updates this entry.':'');
@@ -412,12 +495,13 @@ async function addMedia(file,kind){
   const isAudio=file.type.startsWith('audio/')||extension==='m4a'||(!file.type.startsWith('video/')&&audioExtension.includes(extension));
   const isVideo=file.type.startsWith('video/')||(!file.type.startsWith('audio/')&&['mp4','mov','m4v','webm','ogv'].includes(extension));
   if(kind==='audio'&&(cur!=='letter'&&cur!=='song'||!isAudio))return st('Choose an audio file (.m4a, .mp3, .wav, or another audio format).');
+  if(kind==='audio'&&cur==='song'&&(extension!=='mp3'||file.type.startsWith('video/')))return st('Song entries use an MP3 file.');
   if(kind==='video'&&(cur!=='letter'||!isVideo))return st('Choose a video file for a letter.');
   if(file.size>100*1024*1024)return st('Media files must be 100 MB or smaller.');
   const local=URL.createObjectURL(file),media=document.createElement(kind);
   media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
   if(kind==='video')media.playsInline=true;
-  put(media);st(`Uploading ${kind==='audio'?(cur==='song'?'song audio':'voice note'):'video'}…`);
+  put(media);st(`Uploading ${kind==='audio'?(cur==='song'?'song MP3':'voice note'):'video'}…`);
   try{
     const ext=extension||((file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase());
     const name=crypto.randomUUID()+'.'+ext;
@@ -426,7 +510,7 @@ async function addMedia(file,kind){
     const{error}=await sb.storage.from('media').upload(name,file,{contentType});
     if(error)throw error;
     media.src=sb.storage.from('media').getPublicUrl(name).data.publicUrl;
-    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?(cur==='song'?'Song audio added.':'Voice note added.'):'Video added.');scheduleDraft();
+    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?(cur==='song'?'Song MP3 added.':'Voice note added.'):'Video added.');scheduleDraft();
   }catch(x){media.remove();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
 }
 $('#voiceFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'audio')};
@@ -434,7 +518,7 @@ $('#videoFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)ad
 
 function stopTracks(){if(recordingStream){recordingStream.getTracks().forEach(track=>track.stop());recordingStream=null}}
 function finishRecording(){
-  clearInterval(recordingTimer);recordingTimer=0;$('#stopRecording').hidden=true;$('#recordVoice').hidden=cur!=='letter'&&cur!=='song';$('#recordVoice').textContent=cur==='song'?'🎵 Record song audio':'⏺ Record live';
+  clearInterval(recordingTimer);recordingTimer=0;$('#stopRecording').hidden=true;$('#recordVoice').hidden=DEMO_MODE||cur!=='letter';$('#recordVoice').textContent='⏺ Record live';
   stopTracks();
 }
 async function startRecording(){
@@ -483,23 +567,34 @@ $('#save').onclick=async()=>{
 };
 $('#new').onclick=()=>{stashDraft();form(cur,null,{fresh:true})};
 
+function renderRecentEntries(){
+  const groups=Object.entries(K).map(([kind,category])=>[kind,category,rows.map((entry,index)=>({entry,index})).filter(({entry})=>entry.kind===kind)]).filter(([, ,items])=>items.length);
+  $('#recent').innerHTML=groups.length?groups.map(([kind,category,items])=>`<details class="categorized-group"><summary>${category[0]} ${esc(category[1])}<small>${items.length}</small></summary><ul>${items.map(({entry,index})=>`<li><span data-i="${index}">${esc(entry.day||'')} · ${esc((entry.title||txt(entry.body)).replace(/\s+/g,' ').slice(0,72)||'Untitled entry')}</span><button type="button" data-d="${index}" aria-label="Delete saved entry">✕</button></li>`).join('')}</ul></details>`).join(''):'<p class="category-empty">No saved entries yet.</p>';
+}
 async function recent(){
-  if(DEMO_MODE){rows=readDemoEntries().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,20);$('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('')||'<li><span>Local demo entries will appear here.</span></li>';return}
-  const{data}=await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(20);
-  rows=data||[];
-  $('#recent').innerHTML=rows.map((r,i)=>`<li><span data-i="${i}">${K[r.kind][0]} ${r.day} ${esc((r.title||txt(r.body)).slice(0,60))}</span><button type="button" data-d="${i}" aria-label="delete">✕</button></li>`).join('');
+  if(DEMO_MODE){rows=readDemoEntries().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));renderRecentEntries();return}
+  const{data}=await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(250);
+  rows=data||[];renderRecentEntries();
 }
 async function recentReactions(){
   if(DEMO_MODE){$('#reactions').innerHTML='<li><span>Reactions require the connected Supabase site.</span></li>';return}
-  const{data,error}=await sb.from('letter_reactions').select('reaction,created_at,context,latitude,longitude,accuracy,entries(title,day)').order('created_at',{ascending:false}).limit(30);
+  const{data,error}=await sb.from('letter_reactions').select('id,reaction,created_at,context,latitude,longitude,accuracy,entries(title,day)').order('created_at',{ascending:false}).limit(30);
   if(error){$('#reactions').innerHTML=`<li><span>Could not load reactions: ${esc(error.message)}. Run the updated setup.sql if the new location fields are missing.</span></li>`;return}
   $('#reactions').innerHTML=data?.length?data.map(item=>{
     const entry=Array.isArray(item.entries)?item.entries[0]:item.entries||{};
     const label=entry.title||'Letter',context=String(item.context||'#letter');
     const where=Number.isFinite(+item.latitude)&&Number.isFinite(+item.longitude)?`<a href="https://www.openstreetmap.org/?mlat=${encodeURIComponent(item.latitude)}&mlon=${encodeURIComponent(item.longitude)}#map=16/${encodeURIComponent(item.latitude)}/${encodeURIComponent(item.longitude)}" target="_blank" rel="noopener">📍 ${(+item.latitude).toFixed(4)}, ${(+item.longitude).toFixed(4)}</a>`:'Location not shared';
-    return`<li><span>${esc(item.reaction)} ${esc(label)} · ${esc(entry.day||'')}<small class="reaction-context">${esc(context)} · ${where}</small></span><small>${esc(new Date(item.created_at).toLocaleString())}</small></li>`
+    return`<li><span>${esc(item.reaction)} ${esc(label)} · ${esc(entry.day||'')}<small class="reaction-context">${esc(context)} · ${where}</small><small class="reaction-context">${esc(new Date(item.created_at).toLocaleString())}</small></span><button type="button" class="retract-reaction" data-retract-reaction="${esc(item.id)}">Retract</button></li>`
   }).join(''):'<li><span>No reactions yet.</span></li>';
 }
+$('#reactions').onclick=async event=>{
+  const button=event.target.closest('[data-retract-reaction]');if(!button||DEMO_MODE)return;
+  if(!confirm('Retract and permanently delete this reaction?'))return;
+  button.disabled=true;button.textContent='Retracting…';
+  const{error}=await sb.from('letter_reactions').delete().eq('id',button.dataset.retractReaction);
+  if(error){button.disabled=false;button.textContent='Retry';st(`Could not retract reaction: ${error.message}`);return}
+  st('Reaction retracted.');recentReactions();
+};
 $('#recent').onclick=async e=>{
   const i=e.target.dataset.i,d=e.target.dataset.d;
   if(i!=null){form(rows[i].kind,rows[i]);scrollTo(0,0)}
