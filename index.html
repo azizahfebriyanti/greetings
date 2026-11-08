@@ -9,7 +9,7 @@
 <script>
   document.documentElement.classList.add('access-gate-pending');
   (() => {
-    const pages = ['letter', 'song', 'hadith', 'reason', 'place'];
+    const pages = ['letter', 'song', 'hadith', 'reason', 'place', 'gallery'];
     const pathPage = location.pathname.replace(/\/+$/, '').split('/').pop();
     const isSectionPage = location.hash.length > 1 || pages.includes(pathPage);
     if (!isSectionPage) document.documentElement.classList.add('mail-intro-enabled');
@@ -85,9 +85,21 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .map-popup{min-width:170px;max-width:320px;color:#342718;font:15px/1.45 var(--body);overflow-wrap:anywhere}
 .map-popup strong{display:block;color:#740001;font:700 16px/1.3 var(--cap)}
 .map-popup p{margin:8px 0 0;white-space:normal}.map-popup small{color:#6b4e16}
+.map-popup__body{margin-top:8px}.map-popup__body img,.map-popup__body video{display:block;width:auto;max-width:100%;max-height:230px;margin:8px auto;border:3px solid #c59a3a;box-shadow:0 4px 12px #0003}.map-popup__body video{background:#090a13}
+.home-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;margin:18px 0 0;padding:8px 15px;border:1px solid #d3a62588;border-radius:3px;color:#f3d895;background:#12111dbb;font:500 .73rem var(--cap);letter-spacing:.08em;text-decoration:none;transition:transform .2s,border-color .2s,background .2s}
+.home-link:hover{transform:translateY(-1px);border-color:var(--gold2);background:#74000166}.home-link:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .unmapped{margin:22px 0;padding:18px;border:1px dashed #d3a62588;border-radius:4px;background:#0b0a1488;text-align:left}
 .unmapped h4{margin:0 0 10px;color:var(--gold2);font:500 .85rem var(--cap)}
 .unmapped .sheet{margin:10px 0;padding:16px}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:18px 0 30px;text-align:left}
+.gallery-post{min-width:0;overflow:hidden;border:1px solid #d3a62570;border-radius:4px;background:linear-gradient(150deg,#21182a,#11111b 75%);box-shadow:0 15px 38px #0007}
+.gallery-post__head{padding:16px 17px 10px}.gallery-post__caption{margin:0;color:#f3d895;font:700 1rem/1.35 var(--cap);overflow-wrap:anywhere}.gallery-post__date{display:block;margin-top:5px;color:#d9c8a3;font-size:.86rem;opacity:.78}
+.gallery-post__body{padding:0 17px;color:#f2e6ce;font-size:1.03rem;line-height:1.6;overflow-wrap:anywhere}.gallery-post__body p{margin:.55em 0}.gallery-post__body img{display:block;width:auto;max-width:100%;max-height:420px;height:auto;margin:12px auto;border:4px solid #b58b3b;background:#171522;box-shadow:0 8px 22px #0008;transform-origin:center;animation:portrait-drift 12s ease-in-out infinite alternate;will-change:transform}.gallery-post__body video{display:block;width:100%;max-height:420px;margin:12px auto;border:1px solid #b58b3b;background:#090a13}.gallery-post__body audio{display:block;width:100%;margin:12px auto}
+@keyframes portrait-drift{from{transform:scale(1) translate3d(-.3%,.2%,0) rotate(-.25deg)}to{transform:scale(1.055) translate3d(.35%,-.25%,0) rotate(.25deg)}}
+.gallery-post__actions{display:flex;align-items:center;gap:10px;padding:12px 17px;border-top:1px solid #d3a62525}.gallery-like,.gallery-comments-toggle,.gallery-comment-form button{min-height:40px;padding:8px 13px;border:1px solid #d3a62570;border-radius:3px;color:#f3d895;background:#181522;font:500 .72rem var(--cap);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}.gallery-like:hover,.gallery-comments-toggle:hover,.gallery-comment-form button:hover{transform:translateY(-1px);border-color:var(--gold2);background:#4b1528}.gallery-like[aria-pressed="true"]{color:#ffd9da;border-color:#c64c5b;background:#74000166}.gallery-like:disabled,.gallery-comments-toggle:disabled,.gallery-comment-form button:disabled{opacity:.58;cursor:wait}.gallery-post__comments{padding:0 17px 16px}.gallery-comments-toggle{width:100%;text-align:left}.gallery-comment-list{display:grid;gap:8px;margin:12px 0;padding:0;list-style:none}.gallery-comment-list li{padding:9px 11px;border-left:2px solid #d3a62599;background:#ffffff0a;color:#eee0c7;font-size:.95rem;white-space:pre-wrap;overflow-wrap:anywhere}.gallery-comment-list time{display:block;margin-top:4px;color:#d9c8a3;font-size:.72rem;opacity:.7}.gallery-comment-form{display:grid;gap:8px;margin-top:10px}.gallery-comment-form textarea{width:100%;min-height:74px;resize:vertical;padding:10px;border:1px solid #b58b3b66;border-radius:3px;color:#f6edda;background:#0b0a14;font:1rem/1.45 var(--body)}.gallery-comment-form button{justify-self:end}.gallery-status{grid-column:1/-1;margin:0;color:#e6c77e;font:italic .9rem/1.5 var(--body)}
+@media(max-width:560px){.gallery-grid{grid-template-columns:minmax(0,1fr);gap:14px}.gallery-post__body img{max-height:380px}}
+@media(prefers-reduced-motion:reduce){.gallery-post__body img{animation:none!important;transform:none!important;will-change:auto}}
 .special-countdown{margin:15px 0 0;color:#f3d895;font:500 clamp(.85rem,3.8vw,1rem)/1.55 var(--cap);letter-spacing:.025em;text-shadow:0 0 14px #eeba3044}
 .audio-player{position:relative;display:grid;grid-template-columns:42px 54px 42px minmax(80px,1fr) auto;grid-template-rows:auto auto;align-items:center;gap:8px 10px;width:min(100%,520px);margin:20px auto;padding:14px 16px;border:1px solid #b58b3b88;border-radius:4px;background:radial-gradient(ellipse at 50% 0,#48213c55,transparent 58%),linear-gradient(130deg,#171522,#10121a 72%);box-shadow:0 12px 30px #0007,inset 0 0 22px #d3a6250b;overflow:hidden}
 .audio-player::before,.audio-player::after{position:absolute;content:"";pointer-events:none}
@@ -473,14 +485,14 @@ const DEMO_MODE=LOCAL_HOST&&new URLSearchParams(location.search).get('demo')==='
 const DEMO_ENTRIES='owlpost:local-admin-demo-entries:v1',DEMO_SETTINGS='owlpost:local-admin-demo-settings:v1';
 const sb=!DEMO_MODE&&C.url&&window.supabase?supabase.createClient(C.url,C.key,{auth:{storageKey:'owlpost-satrio-visitor-auth-v1',persistSession:true}}):null;
 const VISITOR_AUTH_TIME='owlpost:satrio-authenticated-at:v1',VISITOR_AUTH_WINDOW=60*60*1000;
-let visitorAccess=false,accessReadyResolve,accessReadyDone=false;
+let visitorAccess=false,visitorUserId='',accessReadyResolve,accessReadyDone=false;
 const accessReady=new Promise(resolve=>{accessReadyResolve=resolve});
 function settleAccess(allowed){visitorAccess=allowed;if(!accessReadyDone){accessReadyDone=true;accessReadyResolve(allowed)}}
 function visitorAuthTime(){try{return Number(localStorage.getItem(VISITOR_AUTH_TIME))||0}catch{return 0}}
 function rememberVisitorAuth(){try{localStorage.setItem(VISITOR_AUTH_TIME,String(Date.now()))}catch{}}
 function clearVisitorAuth(){try{localStorage.removeItem(VISITOR_AUTH_TIME)}catch{}}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const clean=h=>window.DOMPurify?DOMPurify.sanitize(h||'',{ADD_TAGS:['audio','video','source'],ADD_ATTR:['controls','preload','playsinline','poster']}):'';
+const clean=h=>window.DOMPurify?DOMPurify.sanitize(h||'',{ADD_TAGS:['audio','video','source'],ADD_ATTR:['controls','preload','playsinline','poster','loop','muted','autoplay']}):'';
 const fmt=d=>new Date(d+'T00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 const calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
@@ -490,7 +502,8 @@ const S={
   song:{i:'🎶',n:'Wizarding Wireless',s:'Song of the day',d:1},
   hadith:{i:'📜',n:'The Library',s:'Hadith of the day',d:1},
   reason:{i:'🪞',n:'Mirror of Erised',s:'Reasons why I love you'},
-  place:{i:'🗺️',n:"Marauder's Map",s:"Places we've been"}
+  place:{i:'🗺️',n:"Marauder's Map",s:"Places we've been"},
+  gallery:{i:'🖼️',n:'Moving Portraits',s:'Our enchanted gallery'}
 };
 
 // sample data, only used until config.js is filled in
@@ -503,7 +516,9 @@ const DEMO=[
   {kind:'place',day:T,title:'Our favourite café',meta:{rating:5},body:'<p>Best hot chocolate, best company.</p>'}
 ];
 
-let placeMap=null,specialEvents=[],songEntriesPromise=null,songPrimer=null,songPrimerSrc='';
+let placeMap=null,specialEvents=[],songEntriesPromise=null,songPrimer=null,songPrimerSrc='',activeSongAudio=null;
+const GALLERY_ACTIVITY_LOCAL='owlpost:gallery-activity:v1';
+let galleryEntries=[],galleryActivity=[],galleryActivityReady=false,galleryActivityError='',galleryOpenComments=new Set(),routeVersion=0;
 
 async function load(k){
   if(DEMO_MODE){try{const items=JSON.parse(localStorage.getItem(DEMO_ENTRIES)||'[]');const saved=Array.isArray(items)?items.filter(e=>e.kind===k):[];if(saved.length)return saved}catch{}}
@@ -530,6 +545,7 @@ function audioUrl(audio){
 }
 
 const stars=n=>{n=Math.max(0,Math.min(5,+n||0));return'★'.repeat(n)+'☆'.repeat(5-n)};
+const homeControl=()=>'<a class="home-link" href="#home">← Home</a>';
 function card(k,e){
   const m=e.meta||{},bodyHasAudio=/\baudio\b/i.test(e.body||''),b=`<div class="body">${clean(e.body)}</div>`;
   if(k==='reason')return`<article class="sheet reason">${b}</article>`;
@@ -540,6 +556,64 @@ function card(k,e){
   const react=k==='letter'?reactionMarkup(e):'';
   const songNote=k==='song'&&!bodyHasAudio?'<p class="song-source-note">The song MP3 is on its way. Add it from Staff Room to play it here.</p>':'';
   return`<article class="sheet ${k}"><div class="date">${fmt(e.day)}</div>${h}${k==='song'?songNote:''}${b}${react}</article>`;
+}
+
+function readGalleryActivity(){try{const value=JSON.parse(localStorage.getItem(GALLERY_ACTIVITY_LOCAL)||'[]');return Array.isArray(value)?value:[]}catch{return[]}}
+function galleryPostMarkup(entry){
+  const items=galleryActivity.filter(item=>item.entry_id===entry.id),likes=items.filter(item=>item.action==='like'),comments=items.filter(item=>item.action==='comment');
+  const liked=items.some(item=>item.action==='like'&&item.user_id===(DEMO_MODE?visitorId():visitorUserId));
+  const open=galleryOpenComments.has(entry.id),caption=String(entry.title||'A moment worth keeping');
+  return`<article class="gallery-post" data-gallery-entry="${esc(entry.id)}"><header class="gallery-post__head"><h4 class="gallery-post__caption">${esc(caption)}</h4><time class="gallery-post__date" datetime="${esc(entry.day||T)}">${esc(fmt(entry.day||T))}</time></header><div class="gallery-post__body">${clean(entry.body||'')}</div><div class="gallery-post__actions"><button type="button" class="gallery-like" data-gallery-like="${esc(entry.id)}" data-liked="${liked}" aria-pressed="${liked}" ${galleryActivityReady?'':'disabled'}>${liked?'♥ Liked':'♡ Like'} · <span>${likes.length}</span></button></div><div class="gallery-post__comments"><button type="button" class="gallery-comments-toggle" data-comments-toggle="${esc(entry.id)}" aria-expanded="${open}" ${galleryActivityReady?'':'disabled'}>💬 Comments (${comments.length})</button><div class="gallery-comment-content" ${open?'':'hidden'}><ul class="gallery-comment-list">${comments.length?comments.map(item=>`<li>${esc(item.body)}<time datetime="${esc(item.created_at||'')}">${esc(item.created_at?new Date(item.created_at).toLocaleString():'')}</time></li>`).join(''):'<li class="gallery-no-comments">No comments yet. Leave the first little note ✨</li>'}</ul><form class="gallery-comment-form" data-gallery-comment="${esc(entry.id)}"><label class="sr-only" for="gallery-comment-${esc(entry.id)}">Write a comment on ${esc(caption)}</label><textarea id="gallery-comment-${esc(entry.id)}" name="comment" maxlength="2000" placeholder="Leave a kind little note…" required ${galleryActivityReady?'':'disabled'}></textarea><button type="submit" ${galleryActivityReady?'':'disabled'}>Send comment ✨</button></form></div></div></article>`;
+}
+function renderGalleryPosts(focusId=''){
+  const root=$('#galleryList');if(!root)return;
+  root.innerHTML=galleryEntries.length?galleryEntries.map(galleryPostMarkup).join(''):'<p class="hint">No portraits in the album yet. The next enchanted memory is on its way ✨</p>';
+  $('#galleryStatus').textContent=galleryActivityError;
+  if(!calm)root.querySelectorAll('video').forEach(video=>{video.muted=true;video.loop=true;video.playsInline=true;video.play().catch(()=>{})});
+  if(focusId){const target=Array.from(root.querySelectorAll('[data-gallery-like]')).find(button=>button.dataset.galleryLike===focusId);target?.focus({preventScroll:true})}
+}
+async function showGallery(list,version){
+  galleryEntries=list;galleryActivity=[];galleryActivityReady=DEMO_MODE;galleryActivityError='';
+  $('#view').innerHTML=`<h3 class="head">${S.gallery.i} ${S.gallery.n}<small>${S.gallery.s}</small></h3><a class="home-link" href="#home">← Home</a><div class="gallery-grid" id="galleryList"></div><p class="gallery-status" id="galleryStatus" role="status" aria-live="polite"></p>`;
+  if(DEMO_MODE){const ids=new Set(list.map(entry=>entry.id));galleryActivity=readGalleryActivity().filter(item=>ids.has(item.entry_id));renderGalleryPosts();return}
+  if(!sb){galleryActivityError='Likes and comments need the connected Supabase account.';renderGalleryPosts();return}
+  if(list.length){
+    try{
+      const{data,error}=await sb.from('gallery_activity').select('id,entry_id,user_id,action,body,created_at').in('entry_id',list.map(entry=>entry.id)).order('created_at',{ascending:true});
+      if(version!==routeVersion)return;
+      if(error)galleryActivityError='Run the updated setup.sql in Supabase to enable gallery likes and comments.';
+      else{galleryActivity=data||[];galleryActivityReady=true}
+    }catch{galleryActivityError='Could not load the gallery responses. Check the connection and retry.'}
+  }else galleryActivityReady=true;
+  renderGalleryPosts();
+}
+
+async function toggleGalleryLike(button){
+  const entryId=button.dataset.galleryLike,liked=button.dataset.liked==='true';button.disabled=true;
+  try{
+    if(DEMO_MODE){
+      const items=readGalleryActivity(),userId=visitorId(),existing=items.find(item=>item.entry_id===entryId&&item.user_id===userId&&item.action==='like');
+      const next=liked?items.filter(item=>item!==existing):[...items,{id:newId(),entry_id:entryId,user_id:userId,action:'like',body:'',created_at:new Date().toISOString()}];
+      localStorage.setItem(GALLERY_ACTIVITY_LOCAL,JSON.stringify(next));galleryActivity=next.filter(item=>galleryEntries.some(entry=>entry.id===item.entry_id));
+    }else{
+      if(!visitorUserId)throw new Error('Please refresh after signing in, then try again.');
+      if(liked){const{error}=await sb.from('gallery_activity').delete().eq('entry_id',entryId).eq('user_id',visitorUserId).eq('action','like');if(error)throw error;galleryActivity=galleryActivity.filter(item=>!(item.entry_id===entryId&&item.user_id===visitorUserId&&item.action==='like'))}
+    else{const{data,error}=await sb.from('gallery_activity').insert({entry_id:entryId,user_id:visitorUserId,action:'like',body:''}).select('id,entry_id,user_id,action,body,created_at').single();if(error&&error.code!=='23505')throw error;if(data)galleryActivity.push(data);else if(error?.code==='23505')galleryActivity.push({entry_id:entryId,user_id:visitorUserId,action:'like',body:'',created_at:new Date().toISOString()})}
+    }
+    galleryActivityError='';renderGalleryPosts(entryId);
+  }catch(error){button.disabled=false;galleryActivityError=error.message||'Could not save the like. Try again.';const status=$('#galleryStatus');if(status)status.textContent=galleryActivityError}
+}
+
+async function submitGalleryComment(form){
+  const entryId=form.dataset.galleryComment,textarea=form.querySelector('textarea'),body=textarea.value.trim(),submit=form.querySelector('button[type="submit"]');
+  if(!body)return;submit.disabled=true;
+  try{
+    let item;
+    if(DEMO_MODE){item={id:newId(),entry_id:entryId,user_id:visitorId(),action:'comment',body,created_at:new Date().toISOString()};const all=readGalleryActivity();all.push(item);localStorage.setItem(GALLERY_ACTIVITY_LOCAL,JSON.stringify(all));galleryActivity=all.filter(activity=>galleryEntries.some(entry=>entry.id===activity.entry_id))}
+    else{if(!visitorUserId)throw new Error('Please refresh after signing in, then try again.');const{data,error}=await sb.from('gallery_activity').insert({entry_id:entryId,user_id:visitorUserId,action:'comment',body}).select('id,entry_id,user_id,action,body,created_at').single();if(error)throw error;item=data;galleryActivity.push(item)}
+    if(!$('#galleryList'))return;
+    galleryActivityError='';galleryOpenComments.add(entryId);renderGalleryPosts();Array.from($('#galleryList').querySelectorAll('.gallery-comment-form')).find(form=>form.dataset.galleryComment===entryId)?.querySelector('textarea')?.focus();
+  }catch(error){submit.disabled=false;galleryActivityError=error.message||'Could not post the comment. Try again.';const status=$('#galleryStatus');if(status)status.textContent=galleryActivityError}
 }
 
 function mountAudioPlayer(audio){
@@ -597,6 +671,15 @@ function getReactionLocation(){
 }
 
 $('#view').addEventListener('click',async e=>{
+  const commentToggle=e.target.closest('[data-comments-toggle]');
+  if(commentToggle){
+    const id=commentToggle.dataset.commentsToggle,content=commentToggle.nextElementSibling,open=content.hidden;
+    content.hidden=!open;commentToggle.setAttribute('aria-expanded',String(open));
+    if(open)galleryOpenComments.add(id);else galleryOpenComments.delete(id);
+    return;
+  }
+  const galleryLike=e.target.closest('[data-gallery-like]');
+  if(galleryLike){await toggleGalleryLike(galleryLike);return}
   const trigger=e.target.closest('.reaction-trigger');
   if(trigger){
     const box=trigger.closest('.reaction');
@@ -631,25 +714,19 @@ $('#view').addEventListener('click',async e=>{
   const triggerButton=box.querySelector('.reaction-trigger');triggerButton.textContent=alreadyRecorded?'Reaction already saved ✨':'Reaction sent ✨';triggerButton.setAttribute('aria-expanded','true');
   status.textContent=alreadyRecorded?'A reaction from this browser was already saved for this letter ✨':sb&&box.dataset.entryId?'Your reaction was delivered ✨':'Your reaction is saved on this device ✨';
 });
+$('#view').addEventListener('submit',event=>{
+  const form=event.target.closest('.gallery-comment-form');if(!form)return;
+  event.preventDefault();submitGalleryComment(form);
+});
 
 function placePopup(entry){
-  const doc=new DOMParser().parseFromString(entry.body||'','text/html');
-  const blockTags=new Set(['P','DIV','BLOCKQUOTE','H1','H2','H3','H4','H5','H6','LI']);
-  const extract=node=>{
-    if(node.nodeType===Node.TEXT_NODE)return node.nodeValue||'';
-    if(node.nodeType!==Node.ELEMENT_NODE)return'';
-    if(node.tagName==='BR')return'\n';
-    const content=Array.from(node.childNodes).map(extract).join('');
-    return blockTags.has(node.tagName)?`\n${content}\n`:content;
-  };
-  const cleanText=extract(doc.body).replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
-  const m=entry.meta||{},starsText=stars(m.rating);
-  return`<div class="map-popup"><strong>${esc(entry.title||'A place we visited')}</strong><small>${esc(fmt(entry.day||T))} · ${esc(starsText)}</small>${cleanText?`<p>${esc(cleanText).replace(/\n/g,'<br>')}</p>`:''}</div>`;
+  const m=entry.meta||{},starsText=stars(m.rating),body=clean(entry.body||'');
+  return`<div class="map-popup"><strong>${esc(entry.title||'A place we visited')}</strong><small>${esc(fmt(entry.day||T))} · ${esc(starsText)}</small>${body?`<div class="map-popup__body">${body}</div>`:''}</div>`;
 }
 function showPlaces(list){
   const located=list.filter(e=>Number.isFinite(+e.meta?.lat)&&Number.isFinite(+e.meta?.lng));
   const missing=list.filter(e=>!Number.isFinite(+e.meta?.lat)||!Number.isFinite(+e.meta?.lng));
-  const head=`<h3 class="head">${S.place.i} ${S.place.n}<small>${S.place.s}</small></h3>`;
+  const head=`<h3 class="head">${S.place.i} ${S.place.n}<small>${S.place.s}</small></h3>${homeControl()}`;
   const fallback=missing.length?`<section class="unmapped"><h4>Places waiting for a map pin</h4>${missing.map(e=>card('place',e)).join('')}</section>`:'';
   if(!located.length){$('#view').innerHTML=head+'<p class="hint">No pinned places yet. Add a place and tap its location on the map in the Staff Room.</p>'+fallback;return}
   $('#view').innerHTML=head+'<div class="map-wrap"><div id="placeMap" role="application" aria-label="Map of places visited"></div><div class="map-caption"><span>👣 Follow the visits in date order</span><span>Map data © OpenStreetMap contributors</span></div></div>'+fallback;
@@ -704,9 +781,11 @@ function updateSpecialGreeting(){
 }
 
 async function route(){
+  const version=++routeVersion;
   await accessReady;
-  if(!visitorAccess)return;
+  if(!visitorAccess||version!==routeVersion)return;
   scrollTo(0,0);
+  $('#view').querySelectorAll('video').forEach(video=>video.pause());
   if(placeMap){placeMap.remove();placeMap=null}
   const pathPage=location.pathname.replace(/\/+$/,'').split('/').pop();
   const k=location.hash.slice(1)||(S[pathPage]?pathPage:'');
@@ -719,14 +798,16 @@ async function route(){
     ?'<div class="mail-loading" role="status"><span class="mail-loading__track" aria-hidden="true"><span class="mail-loading__letter">✉</span><span class="mail-loading__letter">✉</span><span class="mail-loading__letter">✉</span></span><span>🦉 the owl is fetching it…</span></div>'
     :'<p class="hint">🦉 the owl is fetching it…</p>';
   let list;
-  try{list=await load(k)}catch(error){
-    v.innerHTML=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3><p class="hint" role="alert">The Supabase archive could not be opened: ${esc(error.message||'check the account access policy')}.</p>`;
+  try{list=await load(k);if(version!==routeVersion)return}catch(error){
+    if(version!==routeVersion)return;
+    v.innerHTML=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>${homeControl()}<p class="hint" role="alert">The Supabase archive could not be opened: ${esc(error.message||'check the account access policy')}.</p>`;
     return;
   }
   if(s.d)list=list.filter(e=>e.day<=T);   // future-dated entries stay hidden until their day
   if(k==='reason')list.reverse();           // oldest first, so reason numbers never change
   if(k==='place'){showPlaces(list);return}
-  const head=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>`;
+  if(k==='gallery'){await showGallery(list,version);return}
+  const head=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>${homeControl()}`;
   if(!list.length){v.innerHTML=head+'<p class="hint">Nothing here yet. The owl is still on its way 🦉</p>';return}
   if(!s.d){
     const cards=list.map(e=>card(k,e)).join('');
@@ -735,13 +816,14 @@ async function route(){
   }
   let i=0;
   const draw=()=>{
+    if(k==='song'&&activeSongAudio){activeSongAudio.pause();activeSongAudio=null}
     v.innerHTML=head+card(k,list[i])+`<div class="pager"><button id="pv" type="button" ${i>=list.length-1?'disabled':''}>‹ older</button><span>${i+1} / ${list.length}</span><button id="nx" type="button" ${i?'':'disabled'}>newer ›</button></div>`;
     $('#pv').onclick=()=>{i++;draw()};
     $('#nx').onclick=()=>{i--;draw()};
     if(k==='song'){
       const audio=$('#view .song .body audio');
       if(audio&&songPrimer&&audioUrl(audio)===songPrimerSrc){audio.replaceWith(songPrimer);songPrimer=null}
-      setupAudioPlayers().forEach(player=>{player.audio.autoplay=true;if(player.audio.paused)player.start(true);else player.setStatus('Now playing · enjoy the tune','playing')});
+      setupAudioPlayers().forEach(player=>{activeSongAudio=player.audio;player.audio.autoplay=true;if(player.audio.paused)player.start(true);else player.setStatus('Now playing · enjoy the tune','playing')});
     }
   };
   draw();
@@ -771,8 +853,9 @@ function showPortraitGate(message){
   portraitPassword.disabled=false;portraitEnter.disabled=false;
   settleAccess(false);window.setTimeout(()=>portraitPassword.focus({preventScroll:true}),0);
 }
-async function grantPortraitAccess(){
+async function grantPortraitAccess(userId=''){
   try{await loadSpecialEvents()}catch{updateSpecialGreeting()}
+  visitorUserId=String(userId||'');
   accessRoot.classList.remove('access-gate-pending','access-gate-locked');portraitGate.setAttribute('aria-hidden','true');
   settleAccess(true);window.dispatchEvent(new Event('owlpost-access-granted'));
   prepareSongAudio();
@@ -787,7 +870,11 @@ async function initializePortraitAccess(){
     const email=String(C.visitorEmail).trim().toLowerCase();
     const startedAt=visitorAuthTime(),age=Date.now()-startedAt;
     const remembered=startedAt>0&&age>=0&&age<VISITOR_AUTH_WINDOW;
-    if(data.session&&String(data.session.user?.email||'').toLowerCase()===email&&remembered){await grantPortraitAccess();return}
+    const invitedSession=data.session&&String(data.session.user?.email||'').toLowerCase()===email;
+    if(invitedSession&&(remembered||startedAt===0)){
+      if(!remembered)rememberVisitorAuth();
+      await grantPortraitAccess(data.session.user?.id);return;
+    }
     if(data.session)await sb.auth.signOut();
     clearVisitorAuth();
     showPortraitGate('The portrait is listening. Enter the password for the invited account.');
@@ -804,7 +891,7 @@ portraitForm.addEventListener('submit',async event=>{
     if(error)throw error;
     const email=String(C.visitorEmail).trim().toLowerCase();
     if(String(data.user?.email||'').toLowerCase()!==email){await sb.auth.signOut();clearVisitorAuth();throw new Error('This is not the invited account.')}
-    rememberVisitorAuth();portraitPassword.value='';await grantPortraitAccess();route();
+    rememberVisitorAuth();portraitPassword.value='';await grantPortraitAccess(data.user?.id);route();
   }catch(error){portraitPassword.value='';portraitPassword.disabled=false;portraitEnter.disabled=false;portraitStatus.textContent='That password did not open the portrait. Try again.';portraitPassword.focus()}
 });
 
@@ -816,7 +903,7 @@ if(!sb)$('.foot').append(' (sample data: fill in config.js)');
 $('#nav').innerHTML=Object.entries(S).map(([k,s])=>`<a href="#${k}" data-k="${k}"><b>${s.i}</b><span>${s.n}</span><small>${s.s}</small></a>`).join('');
 $('#nav').addEventListener('click',event=>{
   if(!event.target.closest('a[data-k="song"]'))return;
-  const audio=$('#view .song .audio-player__source')||songPrimer;
+  const audio=$('#view .song .audio-player__source')||songPrimer||activeSongAudio;
   if(audio?.paused)audio.play().catch(()=>{});
 });
 

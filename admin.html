@@ -78,6 +78,8 @@ button{width:auto;min-height:44px;cursor:pointer;font:700 .95rem Cinzel,serif;to
 #reactions li{align-items:flex-start}
 #reactions .retract-reaction{width:auto;min-width:82px;padding:7px 9px;border-color:#943b4a;color:#ffd9d9;background:#3a101b;font-size:.72rem}
 #reactions .retract-reaction:hover{background:#641728}
+#galleryResponses .gallery-response-context{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;color:#cbb98f;font:.76rem system-ui,sans-serif}
+#galleryResponses li{align-items:flex-start}
 #ed{min-height:300px;padding:16px;color:var(--ink);font-size:1.15rem;line-height:1.7;background:#f1e3c3;border-radius:5px;outline:2px solid transparent}
 #ed:focus{outline-color:var(--gold)}
 #ed img{display:block;max-width:100%;margin:10px auto;border:5px solid #c59a3a}
@@ -126,6 +128,8 @@ li button{padding:4px 9px;background:none}
   .draft-open span{white-space:normal;overflow-wrap:anywhere}
   #reactions li{flex-wrap:wrap}
   #reactions small{width:100%;padding-left:8px}
+  #galleryResponses li{flex-wrap:wrap}
+  #galleryResponses small{width:100%;padding-left:8px}
 }
 @media(max-width:360px){#login{padding:27px 17px}.tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -194,6 +198,8 @@ li button{padding:4px 9px;background:none}
   <div id="drafts"></div>
   <h2 class="section-title">Reactions from the owl post</h2>
   <ul id="reactions"></ul>
+  <h2 class="section-title">Moving Portraits likes and comments</h2>
+  <ul id="galleryResponses"></ul>
   </section>
   <section id="settingsPanel" hidden>
     <section class="special-settings" aria-labelledby="specialTitle">
@@ -224,7 +230,8 @@ const K={
   song:['🎶','Song','Song title',[['artist','Artist']]],
   hadith:['📜','Hadith','Label (optional)',[['source','Source, e.g. Sahih Bukhari 1']]],
   reason:['🪞','Reason',null,[]],
-  place:['🗺️','Place','Place name',[['rating']]]
+  place:['🗺️','Place','Place name',[['rating']]],
+  gallery:['🖼️','Moving Portrait','Caption, e.g. Our day in Hogsmeade',[]]
 };
 const ed=$('#ed'),DRAFT_STORE='owlpost:staff-drafts:v1',LAST_DRAFT_STORE='owlpost:staff-last-draft:v1';
 let cur='letter',edit=null,rows=[],rng,activeDraftKey='',formReady=false,draftTimer=0,placePickerMap=null,placeMarker=null,placeCoords=null,placeSearchCache=new Map(),placeSearchAt=0,placeSearchBusy=false,placeSearchResults=[],eventDrafts=[],recording=null,recordingStream=null,recordingParts=[],recordingTimer=0,recordingStarted=0;
@@ -393,10 +400,10 @@ function form(k,row,options={}){
   syncSongAudioControl();
   placeCoords=k==='place'&&Number.isFinite(+m.lat)&&Number.isFinite(+m.lng)?{lat:+m.lat,lng:+m.lng}:null;
   $('#placePicker').hidden=k!=='place';
-  $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||k!=='letter';$('#video').hidden=DEMO_MODE||k!=='letter';$('#pic').hidden=DEMO_MODE;
+  $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song');$('#recordVoice').hidden=DEMO_MODE||k!=='letter';$('#video').hidden=DEMO_MODE||(k!=='letter'&&k!=='gallery');$('#pic').hidden=DEMO_MODE;
   $('#voice').textContent=k==='song'?'🎵 Upload song MP3':'🎙 Add voice note';
   $('#voiceFile').accept=k==='song'?'.mp3,audio/mpeg':'audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm';
-  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls. Use Remove song MP3, then Save, to delete it.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
+  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls. Use Remove song MP3, then Save, to delete it.':k==='gallery'?'Add a caption, photos, and optional text. Portrait photos drift gently on the public gallery; add a short video for true movement. You can paste copied images or choose Photo and Video.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
   $('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
   $('#recordVoice').textContent='⏺ Record live';
   formReady=true;
@@ -517,11 +524,11 @@ async function addMedia(file,kind){
   const isVideo=file.type.startsWith('video/')||(!file.type.startsWith('audio/')&&['mp4','mov','m4v','webm','ogv'].includes(extension));
   if(kind==='audio'&&(cur!=='letter'&&cur!=='song'||!isAudio))return st('Choose an audio file (.m4a, .mp3, .wav, or another audio format).');
   if(kind==='audio'&&cur==='song'&&(extension!=='mp3'||file.type.startsWith('video/')))return st('Song entries use an MP3 file.');
-  if(kind==='video'&&(cur!=='letter'||!isVideo))return st('Choose a video file for a letter.');
+  if(kind==='video'&&(!['letter','gallery'].includes(cur)||!isVideo))return st('Choose a video file for a letter or gallery post.');
   if(file.size>100*1024*1024)return st('Media files must be 100 MB or smaller.');
   const local=URL.createObjectURL(file),media=document.createElement(kind);
   media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
-  if(kind==='video')media.playsInline=true;
+  if(kind==='video'){media.playsInline=true;if(cur==='gallery'){media.loop=true;media.muted=true}}
   put(media);syncSongAudioControl();st(`Uploading ${kind==='audio'?(cur==='song'?'song MP3':'voice note'):'video'}…`);
   try{
     const ext=extension||((file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase());
@@ -579,7 +586,7 @@ $('#save').onclick=async()=>{
     row.id=edit||newId();row.created_at=existing?.created_at||new Date().toISOString();
     const updated=edit?entries.map(item=>item.id===edit?row:item):[row,...entries];
     try{localStorage.setItem(DEMO_ENTRIES,JSON.stringify(updated))}catch{return st('This browser could not save the local demo entry.')}
-    const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();st('Saved in this browser ✨');return;
+    const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentGalleryActivity();st('Saved in this browser ✨');return;
   }
   const previous=edit?rows.find(entry=>entry.id===edit):null;
   const newAudioPaths=new Set(mediaPathsFromHtml(row.body));
@@ -589,7 +596,7 @@ $('#save').onclick=async()=>{
   if(error)return st(error.message);
   let mediaCleanupError='';
   if(removedSongPaths.length){try{const{error:cleanupError}=await sb.storage.from('media').remove(removedSongPaths);if(cleanupError)mediaCleanupError=cleanupError.message}catch(cleanupError){mediaCleanupError=cleanupError?.message||'network error'}}
-  const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentReactions();st(mediaCleanupError?`Saved; removed from the page, but MP3 storage cleanup failed: ${mediaCleanupError}`:'Saved ✨');
+  const kind=cur,drafts=readDrafts();delete drafts[activeDraftKey];writeDrafts(drafts);formReady=false;form(kind);recent();recentReactions();recentGalleryActivity();st(mediaCleanupError?`Saved; removed from the page, but MP3 storage cleanup failed: ${mediaCleanupError}`:'Saved ✨');
 };
 $('#new').onclick=()=>{stashDraft();form(cur,null,{fresh:true})};
 
@@ -621,14 +628,34 @@ $('#reactions').onclick=async event=>{
   if(error){button.disabled=false;button.textContent='Retry';st(`Could not retract reaction: ${error.message}`);return}
   st('Reaction retracted.');recentReactions();
 };
+async function recentGalleryActivity(){
+  const list=$('#galleryResponses');
+  if(DEMO_MODE){
+    const activity=(()=>{try{const saved=JSON.parse(localStorage.getItem('owlpost:gallery-activity:v1')||'[]');return Array.isArray(saved)?saved:[]}catch{return[]}})();
+    const entries=readDemoEntries();
+    list.innerHTML=activity.length?activity.slice().reverse().map(item=>{const entry=entries.find(row=>row.id===item.entry_id)||{};return`<li><span>${item.action==='like'?'❤️ Liked':'💬 Comment'} · ${esc(entry.title||'Moving portrait')}<small class="gallery-response-context">${esc(item.body||'')} · ${esc(item.created_at?new Date(item.created_at).toLocaleString():'')}</small></span></li>`}).join(''):'<li><span>No gallery likes or comments yet.</span></li>';
+    return;
+  }
+  const{data,error}=await sb.from('gallery_activity').select('id,action,body,created_at,entries(title,day)').order('created_at',{ascending:false}).limit(100);
+  if(error){list.innerHTML=`<li><span>Gallery interactions unavailable. Run the updated setup.sql. ${esc(error.message)}</span></li>`;return}
+  list.innerHTML=data?.length?data.map(item=>{const entry=Array.isArray(item.entries)?item.entries[0]:item.entries||{};const detail=item.action==='like'?'❤️ Satrio liked':'💬 Satrio commented';return`<li><span>${detail} · ${esc(entry.title||'Moving portrait')}<small class="gallery-response-context">${esc(item.body||'')} · ${esc(new Date(item.created_at).toLocaleString())}</small></span><button type="button" class="retract-reaction" data-delete-gallery-response="${esc(item.id)}">Remove</button></li>`}).join(''):'<li><span>No gallery likes or comments yet.</span></li>';
+}
+$('#galleryResponses').onclick=async event=>{
+  const button=event.target.closest('[data-delete-gallery-response]');if(!button||DEMO_MODE)return;
+  if(!confirm('Remove this gallery like or comment?'))return;
+  button.disabled=true;button.textContent='Removing…';
+  const{error}=await sb.from('gallery_activity').delete().eq('id',button.dataset.deleteGalleryResponse);
+  if(error){button.disabled=false;button.textContent='Retry';st(`Could not remove gallery response: ${error.message}`);return}
+  st('Gallery response removed.');recentGalleryActivity();
+};
 $('#recent').onclick=async e=>{
   const i=e.target.dataset.i,d=e.target.dataset.d;
   if(i!=null){form(rows[i].kind,rows[i]);scrollTo(0,0)}
   if(d!=null&&confirm('Delete this entry for good?')){
     const id=rows[d].id;
-    if(DEMO_MODE){localStorage.setItem(DEMO_ENTRIES,JSON.stringify(readDemoEntries().filter(item=>item.id!==id)));recent();return}
+    if(DEMO_MODE){localStorage.setItem(DEMO_ENTRIES,JSON.stringify(readDemoEntries().filter(item=>item.id!==id)));recent();recentGalleryActivity();return}
     await sb.from('entries').delete().eq('id',id);
-    const drafts=readDrafts();delete drafts[`entry:${id}`];writeDrafts(drafts);renderDrafts();recent();recentReactions();
+    const drafts=readDrafts();delete drafts[`entry:${id}`];writeDrafts(drafts);renderDrafts();recent();recentReactions();recentGalleryActivity();
   }
 };
 
@@ -639,7 +666,7 @@ async function boot(){
     const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
     const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
     form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});
-    recent();recentReactions();loadEvents();return;
+    recent();recentReactions();recentGalleryActivity();loadEvents();return;
   }
   const{data:{session}}=await sb.auth.getSession();
   const adminEmail=String(C.adminEmail||'azizahfebriyanti20@gmail.com').trim().toLowerCase();
@@ -651,7 +678,7 @@ async function boot(){
     const drafts=readDrafts();let lastKey='';try{lastKey=localStorage.getItem(LAST_DRAFT_STORE)||''}catch{}
     const draft=drafts[lastKey]||Object.values(drafts).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
     form(draft?.kind||cur,draft?.entryId?{id:draft.entryId,...draft}:null,draft?{draftKey:lastKey}:{});
-    recent();recentReactions();loadEvents();
+    recent();recentReactions();recentGalleryActivity();loadEvents();
   }
 }
 $('#go').onclick=async()=>{

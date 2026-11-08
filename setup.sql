@@ -5,17 +5,22 @@
 -- 3. Replace both email addresses below with CFG.adminEmail and CFG.visitorEmail from config.js, then run this in SQL Editor.
 -- 4. Keep the public anon/publishable key in config.js. Never put a service_role key in browser code.
 -- 5. Put index.html, admin.html and config.js on GitHub Pages (or Netlify / Vercel / Cloudflare Pages).
--- The database only returns entries and special days to signed-in accounts; only the admin can write.
+-- The database returns entries and special days to invited accounts; only the admin can write posts.
 
 create table if not exists entries (
   id uuid primary key default gen_random_uuid(),
-  kind text not null check (kind in ('letter','song','hadith','reason','place')),
+  kind text not null check (kind in ('letter','song','hadith','reason','place','gallery')),
   day date not null default current_date,
   title text default '',
   body text default '',
   meta jsonb not null default '{}',
   created_at timestamptz not null default now()
 );
+
+-- Add Gallery to existing installations too. Re-running setup.sql remains safe.
+alter table public.entries drop constraint if exists entries_kind_check;
+alter table public.entries add constraint entries_kind_check
+  check (kind in ('letter','song','hadith','reason','place','gallery'));
 
 alter table entries enable row level security;
 
@@ -77,6 +82,50 @@ grant select on public.letter_reactions to authenticated;
 revoke insert on public.letter_reactions from anon;
 grant insert on public.letter_reactions to authenticated;
 grant delete on public.letter_reactions to authenticated;
+
+-- Gallery likes and comments: only the admin can publish posts; Satrio can react to them.
+create table if not exists public.gallery_activity (
+  id uuid primary key default gen_random_uuid(),
+  entry_id uuid not null references public.entries(id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  action text not null check (action in ('like','comment')),
+  body text not null default '',
+  created_at timestamptz not null default now(),
+  check (
+    (action = 'like' and body = '') or
+    (action = 'comment' and char_length(trim(body)) between 1 and 2000)
+  )
+);
+create unique index if not exists gallery_one_like_per_user
+  on public.gallery_activity(entry_id,user_id) where action='like';
+create index if not exists gallery_activity_by_entry
+  on public.gallery_activity(entry_id,created_at);
+
+alter table public.gallery_activity enable row level security;
+drop policy if exists "invited accounts can read gallery activity" on public.gallery_activity;
+create policy "invited accounts can read gallery activity" on public.gallery_activity
+  for select to authenticated using (
+    lower(coalesce(auth.jwt() ->> 'email','')) in ('azizahfebriyanti20@gmail.com','satriods547@gmail.com')
+  );
+drop policy if exists "visitor adds gallery activity" on public.gallery_activity;
+create policy "visitor adds gallery activity" on public.gallery_activity
+  for insert to authenticated with check (
+    user_id = auth.uid()
+    and lower(coalesce(auth.jwt() ->> 'email','')) = 'satriods547@gmail.com'
+    and exists (select 1 from public.entries where entries.id = gallery_activity.entry_id and entries.kind = 'gallery')
+    and (
+      (action = 'like' and body = '') or
+      (action = 'comment' and char_length(trim(body)) between 1 and 2000)
+    )
+  );
+drop policy if exists "owner or visitor retracts gallery likes" on public.gallery_activity;
+create policy "owner or visitor retracts gallery likes" on public.gallery_activity
+  for delete to authenticated using (
+    lower(coalesce(auth.jwt() ->> 'email','')) = 'azizahfebriyanti20@gmail.com'
+    or (lower(coalesce(auth.jwt() ->> 'email','')) = 'satriods547@gmail.com' and user_id = auth.uid() and action = 'like')
+  );
+revoke all on table public.gallery_activity from anon, authenticated;
+grant select, insert, delete on table public.gallery_activity to authenticated;
 
 -- Public, editable-by-owner content for countdowns and special-day greetings.
 create table if not exists public.site_settings (
