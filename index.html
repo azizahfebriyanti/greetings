@@ -340,6 +340,17 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 .gallery-post{scrollbar-width:thin}
 .candle{opacity:.55}
 .head,.head small{text-shadow:0 0 8px #0b0a14,0 1px 2px #0b0a14}
+@media(min-width:561px){
+
+  .gallery-feed{height:clamp(400px,calc(100svh - 255px),900px)}
+  .gallery-post{gap:6px;padding:10px 12px}
+  .gallery-sound{min-height:0;padding:0}
+  .gallery-sound-toggle{flex-basis:34px;width:34px;height:34px;min-height:34px}
+  .gallery-post__actions{padding-top:6px}
+  .gallery-like,.gallery-comments-toggle{min-height:36px;padding:6px 12px}
+  .gallery-post__comments{padding-bottom:0}
+  .gallery-carousel{flex:1 1 0px;height:auto;min-height:150px;max-height:none}
+}
 </style>
 </head>
 <body>
