@@ -97,7 +97,7 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .gallery-post__head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}.gallery-post__caption{margin:0;color:#f3d895;font:700 1rem/1.35 var(--cap);overflow-wrap:anywhere}.gallery-post__date{flex:0 0 auto;color:#d9c8a3;font-size:.8rem;opacity:.78}
 .gallery-carousel{position:relative;flex:1 0 auto;min-height:190px;max-height:min(40svh,510px);aspect-ratio:4/5;overflow:hidden;border:1px solid #d3a62565;background:radial-gradient(ellipse at 50% 45%,#24253b,#080910 78%)}
 .gallery-carousel__track{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.gallery-carousel__track::-webkit-scrollbar{display:none}
-.gallery-slide{position:relative;display:grid;place-items:center;flex:0 0 100%;width:100%;height:100%;min-width:0;scroll-snap-align:center;scroll-snap-stop:always;background:#080910}.gallery-slide img,.gallery-slide video{display:block;width:100%;height:100%;object-fit:contain;background:#080910}.gallery-slide--empty{padding:28px;color:#d9c8a3;text-align:center;font-style:italic}
+.gallery-slide{position:relative;display:grid;place-items:center;flex:0 0 100%;width:100%;height:100%;min-width:0;overflow:hidden;scroll-snap-align:center;scroll-snap-stop:always;background:#080910}.gallery-slide img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;object-position:center;background:#080910}.gallery-slide video{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#080910}.gallery-slide--empty{padding:28px;color:#d9c8a3;text-align:center;font-style:italic}
 .gallery-carousel__arrow{position:absolute;z-index:2;top:50%;display:grid;place-items:center;width:38px;height:44px;min-height:44px;padding:0;transform:translateY(-50%);border:1px solid #d3a62599;border-radius:3px;color:#ffe8a1;background:#100e1acb;font:700 1.5rem/1 var(--cap);cursor:pointer;box-shadow:0 5px 18px #0008}.gallery-carousel__arrow:hover{border-color:var(--gold2);background:#740001bb}.gallery-carousel__arrow--prev{left:8px}.gallery-carousel__arrow--next{right:8px}
 .gallery-carousel__page{position:absolute;z-index:2;top:10px;right:10px;padding:4px 8px;border:1px solid #d3a62555;border-radius:99px;color:#fff3d0;background:#090811bb;font:.72rem system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .gallery-carousel__dots{position:absolute;z-index:2;left:50%;bottom:10px;display:flex;gap:6px;max-width:80%;padding:5px 8px;transform:translateX(-50%);overflow-x:auto;border-radius:99px;background:#08081199}.gallery-carousel__dot{flex:0 0 7px;width:7px;height:7px;min-height:7px;padding:0;border:0;border-radius:50%;background:#ffffff80;cursor:pointer}.gallery-carousel__dot[aria-current="true"]{background:#ffe8a1;box-shadow:0 0 8px #eeba30}
@@ -623,14 +623,14 @@ function galleryPostMarkup(entry){
     }
     const raw=node.getAttribute('src')||node.querySelector('source[src]')?.getAttribute('src')||'',src=safeMediaUrl(raw);if(!src)return'';
     const key=`${entry.id}:${videoIndex++}`,originalAudio=node.getAttribute('data-original-audio')==='true',volume=Math.max(0,Math.min(100,parseInt(node.getAttribute('data-original-volume')||'80',10)||0)),poster=safeMediaUrl(node.getAttribute('poster')||'');
-    return`<div class="gallery-slide"><video src="${esc(src)}" ${poster?`poster="${esc(poster)}"`:''} data-sound-key="${esc(key)}" data-original-audio="${originalAudio}" data-original-volume="${volume}" playsinline loop preload="metadata" aria-label="${esc(caption)}"></video><button class="gallery-video-toggle" type="button" data-gallery-video-toggle="${esc(key)}" aria-label="${originalAudio?'Play video with original sound':'Play video'}">▶${originalAudio?' · 🔊':''}</button></div>`;
+    return`<div class="gallery-slide"><video src="${esc(src)}" ${poster?`poster="${esc(poster)}"`:''} data-sound-key="${esc(key)}" data-original-audio="${originalAudio}" data-original-volume="${volume}" playsinline loop preload="metadata" aria-label="${esc(caption)}"></video><button class="gallery-video-toggle" type="button" data-gallery-video-toggle="${esc(key)}" aria-label="${originalAudio?'Unmute original video sound':'Play video'}">${originalAudio?'🔇':'▶'}</button></div>`;
   }).filter(Boolean);
   mediaNodes.forEach(node=>node.remove());
   const body=clean(doc.body.innerHTML),pageCount=Math.max(1,slides.length);
   if(!slides.length)slides.push('<div class="gallery-slide gallery-slide--empty">No portrait attached to this post.</div>');
   const dots=pageCount>1?`<div class="gallery-carousel__dots" aria-label="Choose a media page">${slides.map((_,i)=>`<button type="button" class="gallery-carousel__dot" data-carousel-to="${i}" aria-label="Show page ${i+1}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div>`:'';
   const arrows=pageCount>1?'<button type="button" class="gallery-carousel__arrow gallery-carousel__arrow--prev" data-carousel-dir="-1" aria-label="Previous media page">‹</button><button type="button" class="gallery-carousel__arrow gallery-carousel__arrow--next" data-carousel-dir="1" aria-label="Next media page">›</button>':'';
-  const soundPlayer=sound&&soundVolume>0?`<div class="gallery-sound" data-gallery-sound="${esc(entry.id)}" data-sound-src="${esc(sound)}" data-sound-volume="${soundVolume}"><button class="gallery-sound-toggle" type="button" data-sound-toggle="${esc(entry.id)}" aria-label="Play background soundtrack" aria-pressed="false">♫</button><div class="gallery-sound__info"><span>ENCHANTED SOUNDTRACK</span><span class="gallery-sound__status" data-sound-status="${esc(entry.id)}">Starting soundtrack…</span></div></div>`:'';
+  const soundPlayer=sound&&soundVolume>0?`<div class="gallery-sound" data-gallery-sound="${esc(entry.id)}" data-sound-src="${esc(sound)}" data-sound-volume="${soundVolume}"><button class="gallery-sound-toggle" type="button" data-sound-toggle="${esc(entry.id)}" aria-label="Unmute background soundtrack" aria-pressed="false">🔇</button><div class="gallery-sound__info"><span>ENCHANTED SOUNDTRACK</span><span class="gallery-sound__status" data-sound-status="${esc(entry.id)}">Starting muted soundtrack…</span></div></div>`:'';
   return`<article class="gallery-post" data-gallery-entry="${esc(entry.id)}"><header class="gallery-post__head"><h4 class="gallery-post__caption">${esc(caption)}</h4><time class="gallery-post__date" datetime="${esc(entry.day||T)}">${esc(fmt(entry.day||T))}</time></header><section class="gallery-carousel" role="region" aria-roledescription="carousel" aria-label="${esc(caption)} media"><div class="gallery-carousel__track" data-carousel-track>${slides.join('')}</div>${arrows}<span class="gallery-carousel__page" data-carousel-page>1 / ${pageCount}</span>${dots}</section><div class="gallery-post__body">${body}</div>${soundPlayer}<div class="gallery-post__actions"><button type="button" class="gallery-like" data-gallery-like="${esc(entry.id)}" data-liked="${liked}" aria-pressed="${liked}" ${galleryActivityReady?'':'disabled'}>${liked?'♥ Liked':'♡ Like'} · <span>${likes.length}</span></button></div><div class="gallery-post__comments"><button type="button" class="gallery-comments-toggle" data-comments-toggle="${esc(entry.id)}" aria-expanded="${open}" ${galleryActivityReady?'':'disabled'}>💬 Comments (${comments.length})</button><div class="gallery-comment-content" ${open?'':'hidden'}><ul class="gallery-comment-list">${comments.length?comments.map(item=>`<li>${esc(item.body)}<time datetime="${esc(item.created_at||'')}">${esc(item.created_at?new Date(item.created_at).toLocaleString():'')}</time></li>`).join(''):'<li class="gallery-no-comments">No comments yet. Leave the first little note ✨</li>'}</ul><form class="gallery-comment-form" data-gallery-comment="${esc(entry.id)}"><label class="sr-only" for="gallery-comment-${esc(entry.id)}">Write a comment on ${esc(caption)}</label><textarea id="gallery-comment-${esc(entry.id)}" name="comment" maxlength="2000" placeholder="Leave a kind little note…" required ${galleryActivityReady?'':'disabled'}></textarea><button type="submit" ${galleryActivityReady?'':'disabled'}>Send comment ✨</button></form></div></div></article>`;
 }
 function renderGalleryPosts(focusId=''){
@@ -646,26 +646,26 @@ function renderGalleryPosts(focusId=''){
 function gallerySoundControl(id){return Array.from($('#galleryList')?.querySelectorAll('.gallery-sound')||[]).find(node=>node.dataset.gallerySound===id)}
 function updateGallerySoundUI(id){
   const control=gallerySoundControl(id),track=gallerySoundtracks.get(id);if(!control||!track)return;
-  const button=control.querySelector('[data-sound-toggle]'),status=control.querySelector('[data-sound-status]'),playing=!!track.audio&&!track.audio.paused;
-  button.textContent=playing?'Ⅱ':'♫';button.setAttribute('aria-label',playing?'Pause background audio':'Play background audio');button.setAttribute('aria-pressed',String(playing));
-  status.textContent=track.message||(playing?'Playing the background soundtrack':track.started?'Soundtrack paused':'Tap ♫ if sound does not start');
+  const button=control.querySelector('[data-sound-toggle]'),status=control.querySelector('[data-sound-status]'),muted=!track.audio||track.audio.muted;
+  button.textContent=muted?'🔇':'🔊';button.setAttribute('aria-label',muted?'Unmute background soundtrack':'Mute background soundtrack');button.setAttribute('aria-pressed',String(!muted));
+  status.textContent=track.message||(muted?'Background soundtrack · muted':'Background soundtrack · sound on');
 }
 function updateGalleryVideoUI(video){
   const button=Array.from($('#galleryList')?.querySelectorAll('[data-gallery-video-toggle]')||[]).find(item=>item.dataset.galleryVideoToggle===video.dataset.soundKey),setting=galleryVideoSettings.get(video.dataset.soundKey);
   if(!button||!setting)return;
-  button.textContent=video.paused?'▶':'Ⅱ';if(setting.enabled)button.textContent+=video.muted?' · 🔇':' · 🔊';
-  button.setAttribute('aria-label',video.paused?(setting.enabled?'Play video with original sound':'Play video'):setting.enabled&&video.muted?'Tap to hear original video sound':'Pause video');
+  if(setting.enabled&&!video.paused){button.textContent=video.muted?'🔇':'🔊';button.setAttribute('aria-label',video.muted?'Unmute original video sound':'Mute original video sound')}
+  else{button.textContent=video.paused?'▶':'Ⅱ';button.setAttribute('aria-label',video.paused?'Play video':'Pause video')}
 }
 function setupGalleryMedia(root){
   galleryPostObserver?.disconnect();galleryPostObserver=null;
   root.querySelectorAll('.gallery-sound').forEach(control=>{
     const id=control.dataset.gallerySound,src=control.dataset.soundSrc,volume=Math.max(0,Math.min(1,(+control.dataset.soundVolume||0)/100));let track=gallerySoundtracks.get(id);
-    if(!track||track.src!==src){track?.audio?.pause();const audio=new Audio(src);audio.loop=true;audio.preload='none';audio.volume=volume;track={src,audio,volume,started:false,userPaused:false,message:''};audio.addEventListener('play',()=>{track.started=true;track.message='';updateGallerySoundUI(id)});audio.addEventListener('pause',()=>updateGallerySoundUI(id));audio.addEventListener('error',()=>{track.message='Could not load this soundtrack';updateGallerySoundUI(id)});gallerySoundtracks.set(id,track)}else{track.volume=volume;track.audio.volume=volume}
+    if(!track||track.src!==src){track?.audio?.pause();const audio=new Audio(src);audio.loop=true;audio.preload='none';audio.volume=volume;audio.muted=true;track={src,audio,volume,started:false,message:''};audio.addEventListener('play',()=>{track.started=true;track.message='';updateGallerySoundUI(id)});audio.addEventListener('pause',()=>updateGallerySoundUI(id));audio.addEventListener('error',()=>{track.message='Could not load this soundtrack';updateGallerySoundUI(id)});gallerySoundtracks.set(id,track)}else{track.volume=volume;track.audio.volume=volume}
     updateGallerySoundUI(id);
   });
   root.querySelectorAll('video').forEach(video=>{
     const key=video.dataset.soundKey,enabled=video.dataset.originalAudio==='true',volume=Math.max(0,Math.min(1,(+video.dataset.originalVolume||0)/100));
-    const setting={volume,enabled};galleryVideoSettings.set(key,setting);video.removeAttribute('controls');video.removeAttribute('autoplay');video.loop=true;video.playsInline=true;video.volume=volume;video.muted=true;
+    const setting={volume,enabled,muted:true};galleryVideoSettings.set(key,setting);video.removeAttribute('controls');video.removeAttribute('autoplay');video.loop=true;video.playsInline=true;video.volume=volume;video.muted=true;
     video.addEventListener('play',()=>updateGalleryVideoUI(video));video.addEventListener('pause',()=>updateGalleryVideoUI(video));
     updateGalleryVideoUI(video);
   });
@@ -681,7 +681,7 @@ function setupGalleryMedia(root){
 }
 function setActiveGalleryPost(post){
   if(!post)return;galleryActivePostId=post.dataset.galleryEntry;
-  $('#galleryList')?.querySelectorAll('.gallery-post').forEach(other=>{if(other===post)return;other.querySelectorAll('video').forEach(video=>{video.pause();video.muted=true});const track=gallerySoundtracks.get(other.dataset.galleryEntry);if(track?.audio&&!track.audio.paused)track.audio.pause()});
+  $('#galleryList')?.querySelectorAll('.gallery-post').forEach(other=>{if(other===post)return;other.querySelectorAll('video').forEach(video=>{video.pause();video.muted=true;const setting=galleryVideoSettings.get(video.dataset.soundKey);if(setting)setting.muted=true});const track=gallerySoundtracks.get(other.dataset.galleryEntry);if(track?.audio&&!track.audio.paused)track.audio.pause()});
   syncGalleryPostMedia(post);
 }
 function activeGallerySlide(post){const track=post?.querySelector('[data-carousel-track]');if(!track)return null;const index=Math.max(0,Math.min(track.children.length-1,Math.round(track.scrollLeft/Math.max(1,track.clientWidth))));return track.children[index]||null}
@@ -691,35 +691,32 @@ function syncGalleryPostMedia(post){
   post.querySelectorAll('video').forEach(video=>{if(video!==activeVideo){video.pause();video.muted=true}});
   if(activeVideo){
     const setting=galleryVideoSettings.get(activeVideo.dataset.soundKey);
-    if(setting?.enabled&&track?.audio&&!track.audio.paused)track.audio.pause();
-    activeVideo.volume=setting?.volume??0;activeVideo.muted=!setting?.enabled;
+    activeVideo.volume=setting?.volume??0;activeVideo.muted=setting?.enabled?setting.muted:true;
     if(!calm)activeVideo.play().then(()=>updateGalleryVideoUI(activeVideo)).catch(()=>{if(setting?.enabled){activeVideo.muted=true;const button=Array.from($('#galleryList')?.querySelectorAll('[data-gallery-video-toggle]')||[]).find(item=>item.dataset.galleryVideoToggle===activeVideo.dataset.soundKey);if(button)button.setAttribute('aria-label','Tap to play video with original sound');updateGalleryVideoUI(activeVideo)}});
-    if(!setting?.enabled&&track&&!track.userPaused&&!calm)playGallerySoundtrack(post.dataset.galleryEntry,false);
+    if(track)playGallerySoundtrack(post.dataset.galleryEntry,false);
     return;
   }
-  if(track&&!track.userPaused&&!calm)playGallerySoundtrack(post.dataset.galleryEntry,false);
+  if(track)playGallerySoundtrack(post.dataset.galleryEntry,false);
 }
 async function playGallerySoundtrack(id,fromUser=false){
   const track=gallerySoundtracks.get(id);if(!track||track.volume<=0)return;
-  if(fromUser)track.userPaused=false;
   if(track.audio&&!track.audio.paused)return;
   gallerySoundtracks.forEach((other,key)=>{if(key!==id&&other.audio&&!other.audio.paused)other.audio.pause()});
   const post=Array.from($('#galleryList')?.querySelectorAll('.gallery-post')||[]).find(item=>item.dataset.galleryEntry===id);
-  post?.querySelectorAll('video').forEach(video=>{video.muted=true});
-  track.audio.volume=track.volume;track.message='';
+  post?.querySelectorAll('video').forEach(video=>{video.muted=true;const setting=galleryVideoSettings.get(video.dataset.soundKey);if(setting)setting.muted=true;updateGalleryVideoUI(video)});
+  track.audio.volume=track.volume;track.audio.muted=fromUser?false:track.audio.muted;track.message='';
   try{await track.audio.play();track.started=true}catch{track.message='Tap ♫ to start the soundtrack';updateGallerySoundUI(id)}
 }
 async function toggleGallerySound(id){
   const track=gallerySoundtracks.get(id);if(!track)return;
-  if(track.audio&&!track.audio.paused){track.userPaused=true;track.audio.pause();return}
+  if(track.audio&&!track.audio.paused){track.audio.muted=!track.audio.muted;track.message='';if(!track.audio.muted){Array.from($('#galleryList')?.querySelectorAll('video')||[]).forEach(video=>{video.muted=true;const setting=galleryVideoSettings.get(video.dataset.soundKey);if(setting)setting.muted=true;updateGalleryVideoUI(video)})}updateGallerySoundUI(id);return}
   await playGallerySoundtrack(id,true);
 }
 async function toggleGalleryVideo(button){
   const key=button.dataset.galleryVideoToggle,video=Array.from($('#galleryList')?.querySelectorAll('video')||[]).find(item=>item.dataset.soundKey===key),setting=galleryVideoSettings.get(key);if(!video||!setting)return;
-  if(!video.paused&&setting.enabled&&video.muted){video.muted=false;try{await video.play()}catch{video.muted=true}updateGalleryVideoUI(video);return}
+  if(!video.paused&&setting.enabled){setting.muted=!video.muted;video.muted=setting.muted;if(!video.muted){const post=video.closest('.gallery-post'),track=gallerySoundtracks.get(post?.dataset.galleryEntry);if(track?.audio){track.audio.muted=true;updateGallerySoundUI(post.dataset.galleryEntry)}}updateGalleryVideoUI(video);return}
   if(!video.paused){video.pause();return}
-  const post=video.closest('.gallery-post'),track=gallerySoundtracks.get(post?.dataset.galleryEntry);if(setting.enabled&&track?.audio&&!track.audio.paused)track.audio.pause();
-  video.volume=setting.volume;video.muted=!setting.enabled;
+  setting.muted=true;video.volume=setting.volume;video.muted=true;
   try{await video.play()}catch{video.muted=true;button.setAttribute('aria-label',setting.enabled?'Tap again to play with original sound':'Play video');try{await video.play()}catch{}}
 }
 async function showGallery(list,version){
