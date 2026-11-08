@@ -1096,9 +1096,13 @@ $('#nav').addEventListener('click',event=>{
   if(audio?.paused)audio.play().catch(()=>{});
 });
 
-// atmosphere: twinkling stars + floating candles
-for(let i=0;i<60;i++){const s=document.createElement('i');s.className='star';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--l:-${Math.random()*5}s`;$('#sky').append(s)}
-for(let i=0;i<8;i++){const c=document.createElement('i');c.className='candle';c.style.cssText=`--x:${5+i*12+Math.random()*5}%;--y:${3+Math.random()*20}%;--d:${3+Math.random()*3}s`;$('#candles').append(c)}
+for(let i=0;i<8;i++){
+  const c=document.createElement('i'),wide=innerWidth>=1100,
+    x=wide?(i%2?91+Math.random()*7:2+Math.random()*7):5+i*12+Math.random()*5;
+  c.className='candle';
+  c.style.cssText=`--x:${x}%;--y:${3+Math.random()*20}%;--d:${3+Math.random()*3}s`;
+  $('#candles').append(c);
+}
 
 addEventListener('hashchange',route);
 initializePortraitAccess();
