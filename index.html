@@ -717,19 +717,17 @@ async function playGallerySoundtrack(id,fromUser=false){
   const track=gallerySoundtracks.get(id);if(!track||track.volume<=0)return;
   if(track.audio&&!track.audio.paused)return;
   gallerySoundtracks.forEach((other,key)=>{if(key!==id&&other.audio&&!other.audio.paused)other.audio.pause()});
-  const post=Array.from($('#galleryList')?.querySelectorAll('.gallery-post')||[]).find(item=>item.dataset.galleryEntry===id);
-  post?.querySelectorAll('video').forEach(video=>{video.muted=true;const setting=galleryVideoSettings.get(video.dataset.soundKey);if(setting)setting.muted=true;updateGalleryVideoUI(video)});
   track.audio.volume=track.volume;track.audio.muted=fromUser?false:track.audio.muted;track.message='';
   try{await track.audio.play();track.started=true}catch{track.message='Tap ♫ to start the soundtrack';updateGallerySoundUI(id)}
 }
 async function toggleGallerySound(id){
   const track=gallerySoundtracks.get(id);if(!track)return;
-  if(track.audio&&!track.audio.paused){track.audio.muted=!track.audio.muted;track.message='';if(!track.audio.muted){Array.from($('#galleryList')?.querySelectorAll('video')||[]).forEach(video=>{video.muted=true;const setting=galleryVideoSettings.get(video.dataset.soundKey);if(setting)setting.muted=true;updateGalleryVideoUI(video)})}updateGallerySoundUI(id);return}
+  if(track.audio&&!track.audio.paused){track.audio.muted=!track.audio.muted;track.message='';updateGallerySoundUI(id);return}
   await playGallerySoundtrack(id,true);
 }
 async function toggleGalleryVideo(button){
   const key=button.dataset.galleryVideoToggle,video=Array.from($('#galleryList')?.querySelectorAll('video')||[]).find(item=>item.dataset.soundKey===key),setting=galleryVideoSettings.get(key);if(!video||!setting)return;
-  if(!video.paused&&setting.enabled){setting.muted=!video.muted;video.muted=setting.muted;if(!video.muted){const post=video.closest('.gallery-post'),track=gallerySoundtracks.get(post?.dataset.galleryEntry);if(track?.audio){track.audio.muted=true;updateGallerySoundUI(post.dataset.galleryEntry)}}updateGalleryVideoUI(video);return}
+  if(!video.paused&&setting.enabled){setting.muted=!video.muted;video.muted=setting.muted;updateGalleryVideoUI(video);return}
   if(!video.paused){video.pause();return}
   setting.muted=true;video.volume=setting.volume;video.muted=true;
   try{await video.play()}catch{video.muted=true;button.setAttribute('aria-label',setting.enabled?'Tap again to play with original sound':'Play video');try{await video.play()}catch{}}
