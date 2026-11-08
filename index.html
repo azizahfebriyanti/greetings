@@ -355,12 +355,13 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   #siteMain:has(#galleryList){width:min(100%,1600px);max-width:1600px}
   #siteMain:has(#galleryList) #view{max-width:none}
 }
-#siteMain:has(#galleryList) .gallery-feed{display:flex;width:100%;height:auto;min-height:0;flex-direction:column;gap:clamp(34px,5vw,64px);margin:20px auto 30px;overflow:visible;scroll-snap-type:none;border:0;border-radius:0;background:transparent;scrollbar-width:none}
+#siteMain:has(#galleryList) .gallery-feed{display:flex;width:min(100%,1320px);height:auto;min-height:0;flex-direction:column;gap:clamp(34px,5vw,64px);margin:20px auto 30px;overflow:visible;scroll-snap-type:none;border:0;border-radius:0;background:transparent;scrollbar-width:none}
 #siteMain:has(#galleryList) .gallery-post{width:100%;height:auto;min-height:0;gap:12px;padding:0;overflow:visible;scroll-snap-align:none;scroll-snap-stop:normal;background:transparent;box-shadow:none}
 #siteMain:has(#galleryList) .gallery-post__body{max-height:none;overflow:visible}
-#siteMain:has(#galleryList) .gallery-carousel{border:0;background:transparent}
+#siteMain:has(#galleryList) .gallery-carousel{max-width:1160px;padding:10px;border:1px solid #d3a62599;border-radius:3px;background:linear-gradient(145deg,#231925,#0a0a12);box-shadow:0 14px 42px #0008,0 0 24px #74000124}
+#siteMain:has(#galleryList) .gallery-carousel__track{inset:10px}
 #siteMain:has(#galleryList) .gallery-slide img,#siteMain:has(#galleryList) .gallery-slide video{object-fit:contain}
-@media(max-width:600px){#siteMain:has(#galleryList) .gallery-feed{gap:36px;margin-top:16px}.gallery-post__head{gap:8px}.gallery-post__date{white-space:nowrap}}
+@media(max-width:600px){#siteMain:has(#galleryList) .gallery-feed{gap:36px;margin-top:16px}.gallery-post__head{gap:8px}.gallery-post__date{white-space:nowrap}#siteMain:has(#galleryList) .gallery-carousel{padding:7px}#siteMain:has(#galleryList) .gallery-carousel__track{inset:7px}}
 </style>
 </head>
 <body>
@@ -752,8 +753,10 @@ function fitGalleryCarousel(carousel){
   const naturalWidth=media.tagName==='IMG'?media.naturalWidth:media.videoWidth,naturalHeight=media.tagName==='IMG'?media.naturalHeight:media.videoHeight;
   if(!naturalWidth||!naturalHeight)return;
   const style=getComputedStyle(post),availableWidth=Math.max(1,post.clientWidth-(parseFloat(style.paddingLeft)||0)-(parseFloat(style.paddingRight)||0));
-  const ratio=naturalWidth/naturalHeight;
-  const width=Math.round(Math.min(availableWidth,naturalWidth)),height=Math.round(width/ratio),index=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
+  const ratio=naturalWidth/naturalHeight,isSmallScreen=window.innerWidth<=600;
+  const frameInset=isSmallScreen?7:10,maxFrameWidth=isSmallScreen?availableWidth:Math.min(availableWidth,1160);
+  const maxMediaHeight=window.innerHeight*0.85,mediaWidth=Math.round(Math.min(naturalWidth,maxFrameWidth-frameInset*2,availableWidth-frameInset*2,maxMediaHeight*ratio));
+  const width=mediaWidth+frameInset*2,height=Math.round(mediaWidth/ratio)+frameInset*2,index=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
   const bounds=carousel.getBoundingClientRect();
   if(Math.abs(bounds.width-width)<2&&Math.abs(bounds.height-height)<2)return;
   carousel.style.width=`${width}px`;carousel.style.height=`${height}px`;
