@@ -9,6 +9,15 @@
 <script>
   document.documentElement.classList.add('access-gate-pending');
   (() => {
+    try {
+      const startedAt = Number(localStorage.getItem('owlpost:satrio-authenticated-at:v1')) || 0;
+      const age = Date.now() - startedAt;
+      if (startedAt > 0 && age >= 0 && age < 60 * 60 * 1000) {
+        document.documentElement.classList.add('access-gate-remembered');
+      }
+    } catch {}
+  })();
+  (() => {
     const pages = ['letter', 'song', 'hadith', 'reason', 'place', 'gallery'];
     const pathPage = location.pathname.replace(/\/+$/, '').split('/').pop();
     const isSectionPage = location.hash.length > 1 || pages.includes(pathPage);
@@ -163,6 +172,8 @@ html.access-gate-pending #siteMain,html.access-gate-locked #siteMain{visibility:
 html.access-gate-pending #mailExperience,html.access-gate-locked #mailExperience{display:none!important}
 .portrait-gate{display:none;position:fixed;z-index:50;inset:0;place-items:center;overflow:auto;padding:max(22px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:var(--parch);background:radial-gradient(ellipse at 15% 45%,#7b172b35,transparent 36%),radial-gradient(ellipse at 80% 14%,#28386c42,transparent 38%),linear-gradient(145deg,#090812f7,#11101bf5 56%,#0a0911f8)}
 html.access-gate-pending .portrait-gate,html.access-gate-locked .portrait-gate{display:grid}
+html.access-gate-pending.access-gate-remembered .portrait-gate{display:none!important}
+html.access-gate-pending.access-gate-remembered::after{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:24px;content:"Restoring your portrait…";color:#e5d29f;background:radial-gradient(ellipse at 50% 42%,#261b35,#0b0a14 72%);font:500 .78rem/1.4 var(--cap);letter-spacing:.16em;text-align:center;text-transform:uppercase}
 .portrait-gate::before{position:fixed;inset:0;content:"";pointer-events:none;opacity:.2;background:repeating-linear-gradient(0deg,#fff0 0 3px,#fff1 4px,#fff0 5px);mix-blend-mode:screen}
 .portrait-layout{position:relative;display:grid;grid-template-columns:minmax(190px,.85fr) minmax(290px,1.15fr);align-items:center;gap:clamp(30px,7vw,76px);width:min(820px,100%);margin:auto;padding:clamp(22px,5vw,50px);border:1px solid #d3a62555;background:linear-gradient(130deg,#161521ed,#0e0d17ed 62%,#180d18ed);box-shadow:0 30px 90px #000b,0 0 55px #74000120,inset 0 0 32px #d3a62508}
 .portrait-art{display:grid;justify-items:center;gap:10px;width:min(100%,260px)}
@@ -797,7 +808,7 @@ const REACTIONS=['❤️','🥹','🥰','🌷','😂'];
 const VISITOR_STORE='owlpost:visitor-id:v1';
 function reactionMarkup(entry){
   const options=REACTIONS.map((emoji,i)=>`<button class="reaction-option" type="button" data-reaction="${emoji}" aria-label="React ${['love','with teary eyes','with a hug','with a flower','with a laugh'][i]}" aria-pressed="false">${emoji}</button>`).join('');
-  return`<section class="reaction" data-entry-id="${esc(entry.id||'')}" aria-label="Letter reactions"><p class="reaction-label">Did this letter make you smile?</p><button class="reaction-trigger" type="button" aria-expanded="false">💌 Leave a reaction</button><div class="reaction-options" hidden>${options}</div><p class="reaction-status" role="status" aria-live="polite">When you send one, the letter and time are saved. Location is optional.</p></section>`;
+  return`<section class="reaction" data-entry-id="${esc(entry.id||'')}" aria-label="Letter reactions"><p class="reaction-label">Did this letter make you smile?</p><button class="reaction-trigger" type="button" aria-expanded="false">💌 Leave a reaction</button><div class="reaction-options" hidden>${options}</div></section>`;
 }
 
 function visitorId(){
