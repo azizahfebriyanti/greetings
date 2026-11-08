@@ -161,7 +161,7 @@ drop policy if exists "only the owner uploads photos" on storage.objects;
 create policy "only the owner uploads photos" on storage.objects for insert to authenticated
   with check (bucket_id = 'photos' and (auth.jwt() ->> 'email') = 'azizahfebriyanti20@gmail.com');
 
--- Audio and video for letter entries use a separate public bucket with a 100 MB limit.
+-- Audio and video for letters and gallery posts use a separate public bucket with a 100 MB limit.
 insert into storage.buckets (id, name, public, file_size_limit)
 values ('media', 'media', true, 104857600)
 on conflict (id) do update set public = excluded.public, file_size_limit = excluded.file_size_limit;
