@@ -95,8 +95,10 @@ nav small{display:block;margin-top:3px;font-size:.82rem;opacity:.7}
 .map-popup strong{display:block;color:#740001;font:700 16px/1.3 var(--cap)}
 .map-popup p{margin:8px 0 0;white-space:normal}.map-popup small{color:#6b4e16}
 .map-popup__body{margin-top:8px}.map-popup__body img,.map-popup__body video{display:block;width:auto;max-width:100%;max-height:230px;margin:8px auto;border:3px solid #c59a3a;box-shadow:0 4px 12px #0003}.map-popup__body video{background:#090a13}
-.home-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;margin:18px 0 0;padding:8px 15px;border:1px solid #d3a62588;border-radius:3px;color:#f3d895;background:#12111dbb;font:500 .73rem var(--cap);letter-spacing:.08em;text-decoration:none;transition:transform .2s,border-color .2s,background .2s}
-.home-link:hover{transform:translateY(-1px);border-color:var(--gold2);background:#74000166}.home-link:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}
+.corner-controls{position:fixed;z-index:30;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:flex;align-items:center;gap:7px}
+.corner-control{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 12px;border:1px solid #d3a62588;border-radius:4px;color:#f3d895;background:#12111de8;box-shadow:0 4px 14px #0006;font:500 .7rem var(--cap);letter-spacing:.06em;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+.corner-control:hover{transform:translateY(-1px);border-color:var(--gold2);background:#74000166}.corner-control:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}.corner-control:disabled{opacity:.6;cursor:wait}
+html.access-gate-pending #cornerControls,html.access-gate-locked #cornerControls,html.mail-intro-enabled #cornerControls{display:none!important}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .unmapped{margin:22px 0;padding:18px;border:1px dashed #d3a62588;border-radius:4px;background:#0b0a1488;text-align:left}
 .unmapped h4{margin:0 0 10px;color:var(--gold2);font:500 .85rem var(--cap)}
@@ -173,7 +175,7 @@ html.access-gate-pending #mailExperience,html.access-gate-locked #mailExperience
 .portrait-gate{display:none;position:fixed;z-index:50;inset:0;place-items:center;overflow:auto;padding:max(22px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));color:var(--parch);background:radial-gradient(ellipse at 15% 45%,#7b172b35,transparent 36%),radial-gradient(ellipse at 80% 14%,#28386c42,transparent 38%),linear-gradient(145deg,#090812f7,#11101bf5 56%,#0a0911f8)}
 html.access-gate-pending .portrait-gate,html.access-gate-locked .portrait-gate{display:grid}
 html.access-gate-pending.access-gate-remembered .portrait-gate{display:none!important}
-html.access-gate-pending.access-gate-remembered::after{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:24px;content:"Restoring your portrait…";color:#e5d29f;background:radial-gradient(ellipse at 50% 42%,#261b35,#0b0a14 72%);font:500 .78rem/1.4 var(--cap);letter-spacing:.16em;text-align:center;text-transform:uppercase}
+html.access-gate-pending.access-gate-remembered::after{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:24px;content:"🦉 One moment…";color:#e5d29f;background:radial-gradient(ellipse at 50% 42%,#261b35,#0b0a14 72%);font:500 .78rem/1.4 var(--cap);letter-spacing:.16em;text-align:center;text-transform:uppercase}
 .portrait-gate::before{position:fixed;inset:0;content:"";pointer-events:none;opacity:.2;background:repeating-linear-gradient(0deg,#fff0 0 3px,#fff1 4px,#fff0 5px);mix-blend-mode:screen}
 .portrait-layout{position:relative;display:grid;grid-template-columns:minmax(190px,.85fr) minmax(290px,1.15fr);align-items:center;gap:clamp(30px,7vw,76px);width:min(820px,100%);margin:auto;padding:clamp(22px,5vw,50px);border:1px solid #d3a62555;background:linear-gradient(130deg,#161521ed,#0e0d17ed 62%,#180d18ed);box-shadow:0 30px 90px #000b,0 0 55px #74000120,inset 0 0 32px #d3a62508}
 .portrait-art{display:grid;justify-items:center;gap:10px;width:min(100%,260px)}
@@ -313,7 +315,6 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 #nav small{margin-top:0;font-size:.77rem;line-height:1.35;text-wrap:balance}
 #view{width:100%;max-width:900px;margin:0 auto}
 #view>.head{margin:27px 0 0}
-#view>.home-link{margin:11px 0 3px}
 #view .sheet{width:min(100%,820px);margin:18px auto;padding:clamp(26px,4.5vw,42px) clamp(19px,5vw,48px);border:1px solid #b58b3b66;border-radius:5px}
 #view .pager{width:min(100%,820px);margin:14px auto 24px}
 #view .map-wrap{padding:9px;border-radius:6px}
@@ -337,6 +338,10 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
 </head>
 <body>
 <div id="sky" aria-hidden="true"></div><div id="candles" aria-hidden="true"></div>
+<nav id="cornerControls" class="corner-controls" aria-label="Page controls" hidden>
+  <a id="cornerHome" class="corner-control" href="#home" hidden>← Home</a>
+  <button id="cornerLogout" class="corner-control" type="button">↪ Log out</button>
+</nav>
 <section class="portrait-gate" id="portraitGate" role="dialog" aria-modal="true" aria-labelledby="portraitTitle">
   <div class="portrait-layout">
     <div class="portrait-art">
@@ -604,7 +609,6 @@ function audioUrl(audio){
 function safeMediaUrl(source){try{const url=new URL(source,location.href);return url.protocol==='https:'||url.protocol==='http:'?url.href:''}catch{return''}}
 
 const stars=n=>{n=Math.max(0,Math.min(5,+n||0));return'★'.repeat(n)+'☆'.repeat(5-n)};
-const homeControl=()=>'<a class="home-link" href="#home">← Home</a>';
 function card(k,e){
   const m=e.meta||{},bodyHasAudio=/\baudio\b/i.test(e.body||''),b=`<div class="body">${clean(e.body)}</div>`;
   if(k==='reason')return`<article class="sheet reason">${b}</article>`;
@@ -732,7 +736,7 @@ async function toggleGalleryVideo(button){
 }
 async function showGallery(list,version){
   galleryEntries=list;galleryActivity=[];galleryActivityReady=DEMO_MODE;galleryActivityError='';
-  $('#view').innerHTML=`<h3 class="head">${S.gallery.i} ${S.gallery.n}<small>${S.gallery.s}</small></h3><a class="home-link" href="#home">← Home</a><p class="gallery-swipe-hint">Swipe up or down for another post · swipe left or right through its pages</p><div class="gallery-feed" id="galleryList" aria-label="Moving portraits. Swipe up or down to change post."></div><p class="gallery-status" id="galleryStatus" role="status" aria-live="polite"></p>`;
+  $('#view').innerHTML=`<h3 class="head">${S.gallery.i} ${S.gallery.n}<small>${S.gallery.s}</small></h3><p class="gallery-swipe-hint">Swipe up or down for another post · swipe left or right through its pages</p><div class="gallery-feed" id="galleryList" aria-label="Moving portraits. Swipe up or down to change post."></div><p class="gallery-status" id="galleryStatus" role="status" aria-live="polite"></p>`;
   if(DEMO_MODE){const ids=new Set(list.map(entry=>entry.id));galleryActivity=readGalleryActivity().filter(item=>ids.has(item.entry_id));renderGalleryPosts();return}
   if(!sb){galleryActivityError='Likes and comments need the connected Supabase account.';renderGalleryPosts();return}
   if(list.length){
@@ -894,7 +898,7 @@ function placePopup(entry){
 function showPlaces(list){
   const located=list.filter(e=>Number.isFinite(+e.meta?.lat)&&Number.isFinite(+e.meta?.lng));
   const missing=list.filter(e=>!Number.isFinite(+e.meta?.lat)||!Number.isFinite(+e.meta?.lng));
-  const head=`<h3 class="head">${S.place.i} ${S.place.n}<small>${S.place.s}</small></h3>${homeControl()}`;
+  const head=`<h3 class="head">${S.place.i} ${S.place.n}<small>${S.place.s}</small></h3>`;
   const fallback=missing.length?`<section class="unmapped"><h4>Places waiting for a map pin</h4>${missing.map(e=>card('place',e)).join('')}</section>`:'';
   if(!located.length){$('#view').innerHTML=head+'<p class="hint">No pinned places yet. Add a place and tap its location on the map in the Staff Room.</p>'+fallback;return}
   $('#view').innerHTML=head+'<div class="map-wrap"><div id="placeMap" role="application" aria-label="Map of places visited"></div><div class="map-caption"><span>👣 Follow the visits in date order</span><span>Map data © OpenStreetMap contributors</span></div></div>'+fallback;
@@ -960,6 +964,7 @@ async function route(){
   const pathPage=location.pathname.replace(/\/+$/,'').split('/').pop();
   const k=location.hash.slice(1)||(S[pathPage]?pathPage:'');
   const s=S[k],v=$('#view');
+  $('#cornerControls').hidden=false;$('#cornerHome').hidden=!s;$('#cornerLogout').hidden=DEMO_MODE;
   $('#home').hidden=!!s;
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.k===k));
   v.innerHTML='';
@@ -970,14 +975,14 @@ async function route(){
   let list;
   try{list=await load(k);if(version!==routeVersion)return}catch(error){
     if(version!==routeVersion)return;
-    v.innerHTML=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>${homeControl()}<p class="hint" role="alert">The Supabase archive could not be opened: ${esc(error.message||'check the account access policy')}.</p>`;
+    v.innerHTML=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3><p class="hint" role="alert">The Supabase archive could not be opened: ${esc(error.message||'check the account access policy')}.</p>`;
     return;
   }
   if(s.d)list=list.filter(e=>e.day<=T);   // future-dated entries stay hidden until their day
   if(k==='reason')list.reverse();           // oldest first, so reason numbers never change
   if(k==='place'){showPlaces(list);return}
   if(k==='gallery'){await showGallery(list,version);return}
-  const head=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>${homeControl()}`;
+  const head=`<h3 class="head">${s.i} ${s.n}<small>${s.s}</small></h3>`;
   if(!list.length){v.innerHTML=head+'<p class="hint">Nothing here yet. The owl is still on its way 🦉</p>';return}
   if(!s.d){
     const cards=list.map(e=>card(k,e)).join('');
@@ -1018,6 +1023,7 @@ $('#seal').onclick=e=>{
 
 const accessRoot=document.documentElement,portraitGate=$('#portraitGate'),portraitForm=$('#portraitForm'),portraitPassword=$('#portraitPassword'),portraitEnter=$('#portraitEnter'),portraitStatus=$('#portraitStatus');
 function showPortraitGate(message){
+  $('#cornerControls').hidden=true;
   accessRoot.classList.remove('access-gate-pending');accessRoot.classList.add('access-gate-locked');
   portraitGate.setAttribute('aria-hidden','false');portraitStatus.textContent=message;
   portraitPassword.disabled=false;portraitEnter.disabled=false;
@@ -1031,6 +1037,13 @@ async function grantPortraitAccess(userId=''){
   prepareSongAudio();
   if(!accessRoot.classList.contains('mail-intro-enabled'))$('#siteMain').focus({preventScroll:true});
 }
+$('#cornerLogout').addEventListener('click',async()=>{
+  const button=$('#cornerLogout');button.disabled=true;button.textContent='Signing out…';
+  try{
+    if(sb){const{error}=await sb.auth.signOut();if(error)throw error}
+    clearVisitorAuth();location.reload();
+  }catch(error){button.disabled=false;button.textContent='↪ Try log out again';button.title=error?.message||'Could not sign out. Please try again.'}
+});
 async function initializePortraitAccess(){
   if(DEMO_MODE||!C.url){await grantPortraitAccess();return}
   if(!sb){showPortraitGate('The portrait cannot reach the castle right now. Check the Supabase setup and reload.');return}
