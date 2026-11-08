@@ -351,6 +351,12 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   .gallery-post__comments{padding-bottom:0}
   .gallery-carousel{flex:0 0 auto;align-self:center;width:100%;height:clamp(190px,42svh,420px);min-height:0;max-height:none}
 }
+@media(min-width:900px){
+  #siteMain:has(#galleryList){width:min(100%,1400px);max-width:1400px}
+  #siteMain:has(#galleryList) #view{max-width:1280px}
+  #siteMain:has(#galleryList) .gallery-feed{width:min(100%,1160px)}
+  #siteMain:has(#galleryList) .gallery-post{gap:14px;padding:clamp(20px,2vw,28px)}
+}
 </style>
 </head>
 <body>
