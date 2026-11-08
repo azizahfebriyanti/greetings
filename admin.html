@@ -164,6 +164,14 @@ main#app{width:min(100%,1280px);max-width:1280px;gap:18px;margin:0 auto}
 #recordStatus{margin:0}
 #ed{min-height:480px;padding:20px;border:1px solid #b58b3b66;font-size:1.12rem;line-height:1.8;box-shadow:inset 0 3px 18px #49371818}
 #ed:focus{outline:2px solid #d3a625}
+.gallery-audio-mix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0;padding:16px;border:1px solid #d3a62555;border-radius:5px;background:#100f1bd9}
+.gallery-audio-mix legend{padding:0 8px;color:#f1d58f;font:700 .88rem Cinzel,serif}
+.gallery-audio-mix label{display:grid;gap:8px;color:#e5d4ac;font-size:.86rem}
+.gallery-audio-mix input[type=range]{width:100%;accent-color:#eeba30}
+.gallery-audio-mix output{color:#f3d895;font-variant-numeric:tabular-nums}
+.gallery-audio-mix .mix-toggle{display:flex;align-items:center;gap:8px;grid-column:1/-1}
+.gallery-audio-mix .mix-toggle input{width:20px;height:20px;accent-color:#eeba30}
+.gallery-audio-mix p{grid-column:1/-1;margin:0;color:#cbb98f;font-size:.82rem;line-height:1.5}
 .row{gap:10px}
 .row #save,.row #new,.row #out{min-height:48px;padding:11px 17px}
 .row #out{margin-left:auto!important}
@@ -178,6 +186,7 @@ main#app{width:min(100%,1280px);max-width:1280px;gap:18px;margin:0 auto}
 .entry-library #galleryResponses .gallery-response-context,.entry-library #reactions .reaction-context{white-space:normal;overflow-wrap:anywhere;line-height:1.45}
 @media(max-width:900px){main#app{width:100%}.staff-workspace{grid-template-columns:minmax(0,1fr)}.entry-library{position:static;max-height:none;overflow:visible}.entry-editor{order:0}.entry-library{order:1}}
 @media(max-width:600px){main#app{gap:14px}.staff-heading h1{font-size:1.65rem}.staff-heading>div>p:last-child{font-size:.9rem}.admin-menu{max-width:none}.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.staff-workspace{gap:13px}.entry-editor,.entry-library{padding:16px}.entry-fields{grid-template-columns:minmax(0,1fr);gap:6px}.entry-fields>label{margin-top:5px}.entry-fields #extra{grid-column:1}.tools{grid-template-columns:repeat(3,minmax(0,1fr))}#ed{min-height:360px;padding:15px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.row #save,.row #new{width:100%}.row #out{grid-column:1/-1;width:100%;margin:0!important}.entry-library li{padding:11px 4px}}
+@media(max-width:600px){.gallery-audio-mix{grid-template-columns:minmax(0,1fr);gap:12px;padding:13px}.gallery-audio-mix .mix-toggle,.gallery-audio-mix p{grid-column:1}}
 </style>
 </head>
 <body class="login-screen">
@@ -236,6 +245,17 @@ main#app{width:min(100%,1280px);max-width:1280px;gap:18px;margin:0 auto}
   <p class="editor-note" id="editorNote">Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.</p>
   <p id="recordStatus" role="status" aria-live="polite"></p>
   <div id="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="entry text"></div>
+  <fieldset id="galleryAudioMix" class="gallery-audio-mix" hidden>
+    <legend>Moving Portrait sound mix</legend>
+    <label id="galleryMusicMix">Background soundtrack volume
+      <span><input id="galleryMusicVolume" type="range" min="0" max="100" step="1" value="45" aria-label="Set background soundtrack volume"><output id="galleryMusicOutput">45%</output></span>
+    </label>
+    <label class="mix-toggle" id="galleryVideoSoundMix"><input id="galleryVideoSoundEnabled" type="checkbox"> Use original video sound</label>
+    <label id="galleryVideoVolumeMix">Original video volume
+      <span><input id="galleryVideoVolume" type="range" min="0" max="100" step="1" value="80" aria-label="Set original video sound volume"><output id="galleryVideoOutput">80%</output></span>
+    </label>
+    <p>Satrio sees this finished mix only. The sliders and original-sound choice are private to Staff Room.</p>
+  </fieldset>
   <p id="draftState" class="draft-state" role="status" aria-live="polite"></p>
   <div class="row">
     <button type="button" id="save">Save ✨</button>
@@ -422,7 +442,7 @@ function scheduleDraft(){
   $('#draftState').textContent='Saving draft…';
   clearTimeout(draftTimer);draftTimer=setTimeout(stashDraft,350);
 }
-document.addEventListener('input',e=>{if(ed.contains(e.target)||e.target.matches('#title,#day,#extra input,#extra select'))scheduleDraft()});
+document.addEventListener('input',e=>{if(ed.contains(e.target)){scheduleDraft();if(cur==='gallery'){syncSongAudioControl();syncGalleryAudioMix()}return}if(e.target.matches('#title,#day,#extra input,#extra select'))scheduleDraft()});
 document.addEventListener('change',e=>{if(e.target.matches('#title,#day,#extra input,#extra select'))scheduleDraft()});
 window.addEventListener('beforeunload',()=>{clearTimeout(draftTimer);stashDraft()});
 document.execCommand('defaultParagraphSeparator',false,'p');
@@ -454,12 +474,13 @@ function form(k,row,options={}){
   v[3].forEach(([n])=>{if(m[n]!=null)$('#x_'+n).value=m[n]});
   ed.innerHTML=source.body||'';
   syncSongAudioControl();
+  syncGalleryAudioMix();
   placeCoords=k==='place'&&Number.isFinite(+m.lat)&&Number.isFinite(+m.lng)?{lat:+m.lat,lng:+m.lng}:null;
   $('#placePicker').hidden=k!=='place';
   $('#voice').hidden=DEMO_MODE||(k!=='letter'&&k!=='song'&&k!=='gallery');$('#recordVoice').hidden=DEMO_MODE||k!=='letter';$('#video').hidden=DEMO_MODE||(k!=='letter'&&k!=='gallery');$('#pic').hidden=DEMO_MODE;
   $('#voice').textContent=k==='song'?'🎵 Upload song MP3':k==='gallery'?'🎵 Background audio':'🎙 Add voice note';
   $('#voiceFile').accept=k==='song'?'.mp3,audio/mpeg':'audio/*,.m4a,.mp3,.aac,.wav,.ogg,.opus,.caf,.flac,.webm';
-  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls. Use Remove song MP3, then Save, to delete it.':k==='gallery'?'Add a caption, photos, optional background audio, or a video. Still portraits drift gently; videos can play with original sound. Paste an image or use the upload buttons.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
+  $('#editorNote').textContent=k==='song'?'Upload an MP3 for this song. It will play on the Song page with pause, seek, and skip controls. Use Remove song MP3, then Save, to delete it.':k==='gallery'?'Build one post with as many photos and videos as you like, then swipe through them. Add optional background music and set its volume or choose the original video sound below. Paste an image or use the upload buttons.':'Tip: use Photo or paste a copied image with Ctrl+V. Letter entries can include uploaded audio or a live voice recording.';
   $('#placeCoordinates').textContent=placeCoords?`Pinned: ${placeCoords.lat.toFixed(6)}, ${placeCoords.lng.toFixed(6)}`:'No map pin selected.';
   $('#recordVoice').textContent='⏺ Record live';
   formReady=true;
@@ -550,9 +571,33 @@ async function shrink(f){
 $('#pic').onclick=()=>$('#file').click();
 $('#voice').onclick=()=>$('#voiceFile').click();
 function syncSongAudioControl(){const button=$('#removeSongAudio');if(button){button.hidden=(cur!=='song'&&cur!=='gallery')||!ed.querySelector('audio');button.textContent=cur==='gallery'?'🗑 Remove background audio':'🗑 Remove song MP3'}}
+function syncGalleryAudioMix(){
+  const panel=$('#galleryAudioMix'),audio=ed.querySelector('audio'),videos=Array.from(ed.querySelectorAll('video'));
+  if(!panel)return;
+  panel.hidden=cur!=='gallery'||(!audio&&!videos.length);
+  $('#galleryMusicMix').hidden=!audio;$('#galleryVideoSoundMix').hidden=!videos.length;$('#galleryVideoVolumeMix').hidden=!videos.length;
+  const musicVolume=Math.max(0,Math.min(100,parseInt(audio?.dataset.galleryVolume||'45',10)||0));
+  const videoVolume=Math.max(0,Math.min(100,parseInt(videos[0]?.dataset.originalVolume||'80',10)||0));
+  $('#galleryMusicVolume').value=String(musicVolume);$('#galleryMusicOutput').value=`${musicVolume}%`;
+  $('#galleryVideoVolume').value=String(videoVolume);$('#galleryVideoOutput').value=`${videoVolume}%`;
+  $('#galleryVideoSoundEnabled').checked=videos[0]?.dataset.originalAudio==='true';
+  if(audio)audio.volume=musicVolume/100;
+  videos.forEach(video=>{video.volume=videoVolume/100;video.muted=!$('#galleryVideoSoundEnabled').checked});
+}
+function applyGalleryAudioMix(){
+  if(cur!=='gallery')return;
+  const musicVolume=String($('#galleryMusicVolume').value),videoVolume=String($('#galleryVideoVolume').value),videoEnabled=String($('#galleryVideoSoundEnabled').checked);
+  ed.querySelectorAll('audio').forEach(audio=>{audio.dataset.galleryVolume=musicVolume;audio.volume=(+musicVolume)/100});
+  ed.querySelectorAll('video').forEach(video=>{video.dataset.originalVolume=videoVolume;video.dataset.originalAudio=videoEnabled;video.volume=(+videoVolume)/100;video.muted=videoEnabled!=='true'});
+  $('#galleryMusicOutput').value=`${musicVolume}%`;$('#galleryVideoOutput').value=`${videoVolume}%`;
+  scheduleDraft();
+}
+$('#galleryMusicVolume').addEventListener('input',applyGalleryAudioMix);
+$('#galleryVideoVolume').addEventListener('input',applyGalleryAudioMix);
+$('#galleryVideoSoundEnabled').addEventListener('change',applyGalleryAudioMix);
 $('#removeSongAudio').onclick=()=>{
   const tracks=ed.querySelectorAll('audio');if(!tracks.length)return;
-  tracks.forEach(track=>{const parent=track.parentElement;track.remove();if(parent?.tagName==='P'&&!parent.textContent.trim()&&!parent.children.length)parent.remove()});syncSongAudioControl();scheduleDraft();
+  tracks.forEach(track=>{const parent=track.parentElement;track.remove();if(parent?.tagName==='P'&&!parent.textContent.trim()&&!parent.children.length)parent.remove()});syncSongAudioControl();syncGalleryAudioMix();scheduleDraft();
   st(`${cur==='gallery'?'Background audio':'Song MP3'} removed from this entry. Save to publish the change.`);
 };
 $('#video').onclick=()=>$('#videoFile').click();
@@ -585,8 +630,8 @@ async function addMedia(file,kind){
   if(file.size>100*1024*1024)return st('Media files must be 100 MB or smaller.');
   const local=URL.createObjectURL(file),media=document.createElement(kind);
   media.controls=true;media.preload='metadata';media.src=local;media.style.opacity='.5';
-  if(kind==='video'){media.playsInline=true;if(cur==='gallery'){media.loop=true;media.muted=true}}
-  if(kind==='audio'&&cur==='gallery')media.loop=true;
+  if(kind==='video'){media.playsInline=true;if(cur==='gallery'){const volume=$('#galleryVideoVolume')?.value||'80',enabled=!!$('#galleryVideoSoundEnabled')?.checked;media.loop=true;media.muted=!enabled;media.dataset.originalAudio=String(enabled);media.dataset.originalVolume=volume;media.volume=(+volume)/100}}
+  if(kind==='audio'&&cur==='gallery'){const volume=$('#galleryMusicVolume')?.value||'45';media.loop=true;media.dataset.galleryVolume=volume;media.volume=(+volume)/100}
   put(media);syncSongAudioControl();st(`Uploading ${kind==='audio'?(cur==='song'?'song MP3':'voice note'):'video'}…`);
   try{
     const ext=extension||((file.type.split('/')[1]||'media').split(';')[0].replace(/[^a-z0-9]/gi,'').toLowerCase());
@@ -596,8 +641,8 @@ async function addMedia(file,kind){
     const{error}=await sb.storage.from('media').upload(name,file,{contentType});
     if(error)throw error;
     media.src=sb.storage.from('media').getPublicUrl(name).data.publicUrl;
-    media.removeAttribute('style');URL.revokeObjectURL(local);st(kind==='audio'?(cur==='song'?'Song MP3 added.':'Voice note added.'):'Video added.');scheduleDraft();
-  }catch(x){media.remove();syncSongAudioControl();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
+    media.removeAttribute('style');URL.revokeObjectURL(local);syncGalleryAudioMix();st(kind==='audio'?(cur==='song'?'Song MP3 added.':'Voice note added.'):'Video added.');scheduleDraft();
+  }catch(x){media.remove();syncSongAudioControl();syncGalleryAudioMix();URL.revokeObjectURL(local);st(x.message||`Could not upload ${kind}.`);scheduleDraft()}
 }
 $('#voiceFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'audio')};
 $('#videoFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addMedia(f,'video')};
