@@ -736,7 +736,7 @@ async function toggleGalleryVideo(button){
 }
 async function showGallery(list,version){
   galleryEntries=list;galleryActivity=[];galleryActivityReady=DEMO_MODE;galleryActivityError='';
-  $('#view').innerHTML=`<h3 class="head">${S.gallery.i} ${S.gallery.n}<small>${S.gallery.s}</small></h3><p class="gallery-swipe-hint">Swipe up or down for another post · swipe left or right through its pages</p><div class="gallery-feed" id="galleryList" aria-label="Moving portraits. Swipe up or down to change post."></div><p class="gallery-status" id="galleryStatus" role="status" aria-live="polite"></p>`;
+  $('#view').innerHTML=`<h3 class="head">${S.gallery.i} ${S.gallery.n}<small>${S.gallery.s}</small></h3><div class="gallery-feed" id="galleryList" aria-label="Moving portraits. Swipe up or down to change post."></div><p class="gallery-status" id="galleryStatus" role="status" aria-live="polite"></p>`;
   if(DEMO_MODE){const ids=new Set(list.map(entry=>entry.id));galleryActivity=readGalleryActivity().filter(item=>ids.has(item.entry_id));renderGalleryPosts();return}
   if(!sb){galleryActivityError='Likes and comments need the connected Supabase account.';renderGalleryPosts();return}
   if(list.length){
@@ -964,8 +964,10 @@ async function route(){
   const pathPage=location.pathname.replace(/\/+$/,'').split('/').pop();
   const k=location.hash.slice(1)||(S[pathPage]?pathPage:'');
   const s=S[k],v=$('#view');
-  $('#cornerControls').hidden=false;$('#cornerHome').hidden=!s;$('#cornerLogout').hidden=DEMO_MODE;
+  const showHome=['letter','song','hadith','gallery','place'].includes(k),showLogout=!DEMO_MODE&&!s;
+  $('#cornerHome').hidden=!showHome;$('#cornerLogout').hidden=!showLogout;$('#cornerControls').hidden=!showHome&&!showLogout;
   $('#home').hidden=!!s;
+  $('#nav').hidden=!!s;
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.k===k));
   v.innerHTML='';
   if(!s)return;
