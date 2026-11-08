@@ -352,11 +352,15 @@ html.mail-intro-enabled.mail-leaving #siteMain{visibility:visible;opacity:1;poin
   .gallery-carousel{flex:0 0 auto;align-self:center;width:100%;height:clamp(190px,42svh,420px);min-height:0;max-height:none}
 }
 @media(min-width:900px){
-  #siteMain:has(#galleryList){width:min(100%,1400px);max-width:1400px}
-  #siteMain:has(#galleryList) #view{max-width:1280px}
-  #siteMain:has(#galleryList) .gallery-feed{width:min(100%,1160px)}
-  #siteMain:has(#galleryList) .gallery-post{gap:14px;padding:clamp(20px,2vw,28px)}
+  #siteMain:has(#galleryList){width:min(100%,1600px);max-width:1600px}
+  #siteMain:has(#galleryList) #view{max-width:none}
 }
+#siteMain:has(#galleryList) .gallery-feed{display:flex;width:100%;height:auto;min-height:0;flex-direction:column;gap:clamp(34px,5vw,64px);margin:20px auto 30px;overflow:visible;scroll-snap-type:none;border:0;border-radius:0;background:transparent;scrollbar-width:none}
+#siteMain:has(#galleryList) .gallery-post{width:100%;height:auto;min-height:0;gap:12px;padding:0;overflow:visible;scroll-snap-align:none;scroll-snap-stop:normal;background:transparent;box-shadow:none}
+#siteMain:has(#galleryList) .gallery-post__body{max-height:none;overflow:visible}
+#siteMain:has(#galleryList) .gallery-carousel{border:0;background:transparent}
+#siteMain:has(#galleryList) .gallery-slide img,#siteMain:has(#galleryList) .gallery-slide video{object-fit:contain}
+@media(max-width:600px){#siteMain:has(#galleryList) .gallery-feed{gap:36px;margin-top:16px}.gallery-post__head{gap:8px}.gallery-post__date{white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -731,7 +735,7 @@ function setupGalleryMedia(root){
     fit();
   });
   if(window.IntersectionObserver){
-    galleryPostObserver=new IntersectionObserver(entries=>{const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)setActiveGalleryPost(visible.target)},{root,threshold:[.35,.6,.85]});
+    galleryPostObserver=new IntersectionObserver(entries=>{const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)setActiveGalleryPost(visible.target)},{root:null,threshold:[.35,.6,.85]});
     root.querySelectorAll('.gallery-post').forEach(post=>galleryPostObserver.observe(post));
   }else{const first=root.querySelector('.gallery-post');if(first)setActiveGalleryPost(first)}
 }
@@ -748,9 +752,8 @@ function fitGalleryCarousel(carousel){
   const naturalWidth=media.tagName==='IMG'?media.naturalWidth:media.videoWidth,naturalHeight=media.tagName==='IMG'?media.naturalHeight:media.videoHeight;
   if(!naturalWidth||!naturalHeight)return;
   const style=getComputedStyle(post),availableWidth=Math.max(1,post.clientWidth-(parseFloat(style.paddingLeft)||0)-(parseFloat(style.paddingRight)||0));
-  const isSmallScreen=window.innerWidth<=560;
-  const maxHeight=Math.min(window.innerHeight*(isSmallScreen?0.62:0.72),isSmallScreen?720:900),ratio=naturalWidth/naturalHeight;
-  const width=Math.round(Math.min(availableWidth,maxHeight*ratio)),height=Math.round(width/ratio),index=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
+  const ratio=naturalWidth/naturalHeight;
+  const width=Math.round(Math.min(availableWidth,naturalWidth)),height=Math.round(width/ratio),index=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
   const bounds=carousel.getBoundingClientRect();
   if(Math.abs(bounds.width-width)<2&&Math.abs(bounds.height-height)<2)return;
   carousel.style.width=`${width}px`;carousel.style.height=`${height}px`;
